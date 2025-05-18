@@ -493,7 +493,7 @@ export default function LandingPage() {
                 Ready to Make Your Boat Smart?
               </h2>
               <p className="text-white/90 text-lg md:text-xl max-w-lg">
-                Get started with Seazr today and never worry about your boat
+                Get Seazr today and never worry about your boat
                 when you are not aboard.
               </p>
               <div className="w-full max-w-md mt-6 border border-white/20 rounded-lg p-1 backdrop-blur-sm bg-white/5">
