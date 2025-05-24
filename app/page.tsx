@@ -2,7 +2,6 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { BarChart3, Compass, Gauge, Globe, Waves, Router } from 'lucide-react';
 
-// Import shadcn/ui components
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
