@@ -16,7 +16,7 @@ export const auth = betterAuth({
   plugins: [nextCookies()],
 });
 
-export async function getSession() {
+export async function getSessionApi() {
   const session = await auth.api.getSession({
     headers: await headers(),
   });
@@ -24,13 +24,13 @@ export async function getSession() {
   return session;
 }
 
-export async function signUpApi(email: string, password: string) {
+export async function signUpApi(name:string, email: string, password: string) {
   try {
     await auth.api.signUpEmail({
       body: {
+        name,
         email,
         password,
-        name: email,
       },
     });
   } catch (error) {

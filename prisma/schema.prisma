@@ -7,16 +7,44 @@ datasource db {
   url      = "file:./dev.db"
 }
 
+model Vessel {
+  id          String    @id @default(cuid())
+  shortId     String    @unique
+  name        String
+  description String?
+  permissions Permission[]
+
+  @@map("vessel")
+}
+
+model Permission {
+  id        String    @id @default(cuid())
+  userId    String
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  vesselId  String
+  vessel    Vessel    @relation(fields: [vesselId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, vesselId])
+  @@map("permission")
+}
+
+enum Role {
+  USER
+  ADMIN
+}
+
 model User {
-  id            String    @id
+  id            String       @id
   name          String
   email         String
   emailVerified Boolean
+  role          Role         @default(USER)
   image         String?
   createdAt     DateTime
   updatedAt     DateTime
   sessions      Session[]
   accounts      Account[]
+  permissions   Permission[]
 
   @@unique([email])
   @@map("user")

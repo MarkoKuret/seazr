@@ -22,7 +22,7 @@ import {
   FormMessage,
 } from '@/components/ui/form';
 
-import { logIn } from '@/server/user';
+import { logIn } from '@/server/auth-action';
 
 export function LoginForm({
   className,

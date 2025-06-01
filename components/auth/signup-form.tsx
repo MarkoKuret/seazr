@@ -22,7 +22,7 @@ import {
   FormMessage,
 } from '@/components/ui/form';
 
-import { signUp } from '@/server/user';
+import { signUp } from '@/server/auth-action';
 
 export function SignupForm({
   className,
@@ -51,7 +51,12 @@ export function SignupForm({
     setError(null);
 
     try {
-      const result = await signUp(data.name, data.email, data.password, data.confirmPassword);
+      const result = await signUp(
+        data.name,
+        data.email,
+        data.password,
+        data.confirmPassword
+      );
       if (typeof result === 'string') {
         setError(result);
         setIsSubmitting(false);
