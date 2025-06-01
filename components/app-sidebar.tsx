@@ -14,7 +14,6 @@ import {
   IconSettings,
 } from '@tabler/icons-react';
 
-
 import { NavDocuments } from '@/components/nav-documents';
 import { NavMain } from '@/components/nav-main';
 import { NavSecondary } from '@/components/nav-secondary';
@@ -85,7 +84,10 @@ interface User {
   image: string;
 }
 
-export function AppSidebar({ user, ...props }: React.ComponentProps<typeof Sidebar> & {user: User}) {
+export function AppSidebar({
+  user,
+  ...props
+}: React.ComponentProps<typeof Sidebar> & { user: User }) {
   const pathname = usePathname();
   return (
     <Sidebar collapsible='offcanvas' {...props}>
@@ -110,8 +112,8 @@ export function AppSidebar({ user, ...props }: React.ComponentProps<typeof Sideb
         </SidebarMenu>
       </SidebarHeader>
       <SidebarContent>
-        <NavMain items={data.navMain} currentPath={pathname}/>
-        <NavDocuments items={data.management} currentPath={pathname}/>
+        <NavMain items={data.navMain} currentPath={pathname} />
+        <NavDocuments items={data.management} currentPath={pathname} />
         <NavSecondary items={data.navSecondary} className='mt-auto' />
       </SidebarContent>
       <SidebarFooter>

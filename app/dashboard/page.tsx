@@ -6,15 +6,13 @@ import { SectionCards } from '@/components/section-cards';
 import { SiteHeader } from '@/components/site-header';
 import { SidebarInset, SidebarProvider } from '@/components/ui/sidebar';
 import { getAllSensorValues, getSensorHistory } from '@/server/sensor-action';
+import { SensorType } from '@/types';
 import { Suspense } from 'react';
 import { getSession } from '@/server/auth-action';
 
 import data from './data.json';
 
 async function SensorCards() {
-  let sensors = [];
-  let error = null;
-
   const session = await getSession();
 
   if (!session?.user) {
@@ -22,23 +20,30 @@ async function SensorCards() {
   }
 
   try {
-    sensors = await getAllSensorValues(session.user.id);
-  } catch (e) {
-    error = e;
-    console.error("Error fetching sensor data:", e);
+    const sensors = await getAllSensorValues(session.user.id);
+    return (
+      <SectionCards
+        sensors={sensors}
+        isLoading={false}
+        minCards={4}
+        placeholderTitle='No Data'
+        placeholderDescription='No sensor available'
+        placeholderMessage='Add sensors to your vessel'
+      />
+    );
+  } catch (error) {
+    console.error('Error fetching sensor data:', error);
+    return (
+      <SectionCards
+        sensors={[]}
+        isLoading={false}
+        minCards={4}
+        placeholderTitle='Error'
+        placeholderDescription='Error loading sensors'
+        placeholderMessage='Please try again later'
+      />
+    );
   }
-
-  // Pass data to the SectionCards component
-  return (
-    <SectionCards
-      sensors={sensors}
-      isLoading={false}
-      minCards={4}
-      placeholderTitle="No Data"
-      placeholderDescription={error ? "Error loading sensors" : "No sensor available"}
-      placeholderMessage={error ? "Please try again later" : "Add sensors to your vessel"}
-    />
-  );
 }
 
 async function SensorChart() {
@@ -49,13 +54,17 @@ async function SensorChart() {
   }
 
   try {
-    // Default to voltage/battery data with 90 days of history
-    const sensorData = await getSensorHistory(session.user.id, 'voltage', 90);
-    return <ChartAreaInteractive batteryData={sensorData} />;
+    // Default to voltage data with 90 days of history
+    const sensorData = await getSensorHistory(
+      session.user.id,
+      'voltage' as SensorType,
+      90
+    );
+    return <ChartAreaInteractive sensorData={sensorData} />;
   } catch (error) {
-    console.error("Error fetching sensor history:", error);
+    console.error('Error fetching sensor history:', error);
     return (
-      <div className="p-6 text-center">
+      <div className='p-6 text-center'>
         <p>Failed to load sensor history data.</p>
       </div>
     );
@@ -63,11 +72,11 @@ async function SensorChart() {
 }
 
 export default async function Page() {
-    const session = await getSession();
+  const session = await getSession();
 
-    if (!session?.user) {
-      redirect('/login');
-    }
+  if (!session?.user) {
+    redirect('/login');
+  }
 
   return (
     <SidebarProvider
@@ -78,21 +87,30 @@ export default async function Page() {
         } as React.CSSProperties
       }
     >
-      <AppSidebar variant='inset' user={{
+      <AppSidebar
+        variant='inset'
+        user={{
           name: session.user.name,
           email: session.user.email,
-          image: "/avatars/shadcn.jpg"
-        }}/>
+          image: '/avatars/shadcn.jpg',
+        }}
+      />
       <SidebarInset>
-        <SiteHeader title="Dashboard"/>
+        <SiteHeader title='Dashboard' />
         <div className='flex flex-1 flex-col'>
           <div className='@container/main flex flex-1 flex-col gap-2'>
             <div className='flex flex-col gap-4 py-4 md:gap-6 md:py-6'>
-              <Suspense fallback={<SectionCards isLoading={true} sensors={[]} />}>
+              <Suspense
+                fallback={<SectionCards isLoading={true} sensors={[]} />}
+              >
                 <SensorCards />
               </Suspense>
               <div className='px-4 lg:px-6'>
-                <Suspense fallback={<div className="h-[250px] animate-pulse bg-muted rounded-lg"></div>}>
+                <Suspense
+                  fallback={
+                    <div className='bg-muted h-[250px] animate-pulse rounded-lg'></div>
+                  }
+                >
                   <SensorChart />
                 </Suspense>
               </div>

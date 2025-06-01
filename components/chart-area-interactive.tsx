@@ -13,7 +13,6 @@ import {
   CardTitle,
 } from '@/components/ui/card';
 import {
-  ChartConfig,
   ChartContainer,
   ChartTooltip,
   ChartTooltipContent,
@@ -26,30 +25,41 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group';
+import { ChartConfigMap, SensorHistoryPoint, SensorType } from '@/types';
 
 // Define the chart config for different sensor types
-const chartConfig = {
-  battery: {
+const chartConfig: ChartConfigMap = {
+  voltage: {
     label: 'Battery',
     color: '#4ade80', // Green color for battery
+    unit: 'V',
+  },
+  battery: {
+    label: 'Battery',
+    color: '#4ade80',
+    unit: 'V',
   },
   temperature: {
     label: 'Temperature',
     color: '#f97316', // Orange for temperature
+    unit: '°C',
   },
   humidity: {
     label: 'Humidity',
     color: '#3b82f6', // Blue for humidity
+    unit: '%',
   },
   pressure: {
     label: 'Pressure',
     color: '#8b5cf6', // Purple for pressure
+    unit: 'hPa',
   },
   water_level: {
     label: 'Water Level',
     color: '#06b6d4', // Cyan for water level
+    unit: '%',
   },
-} satisfies ChartConfig;
+};
 
 // Define available sensor types
 const sensorTypes = [
@@ -60,33 +70,33 @@ const sensorTypes = [
   { id: 'water_level', label: 'Water Level', unit: '%' },
 ];
 
-type SensorData = {
-  date: string;
-  value: number;
-  vesselId: string;
-  type?: string; // For future use if we expand beyond battery data
+interface ChartAreaInteractiveProps {
+  sensorData: SensorHistoryPoint[];
 }
 
-export function ChartAreaInteractive({ batteryData = [] }: { batteryData: SensorData[] }) {
+export function ChartAreaInteractive({
+  sensorData = [],
+}: ChartAreaInteractiveProps) {
   const isMobile = useIsMobile();
   const [timeRange, setTimeRange] = React.useState('30d');
   const [selectedVessel, setSelectedVessel] = React.useState<string>('all');
-  const [selectedSensorType, setSelectedSensorType] = React.useState<string>('voltage');
+  const [selectedSensorType, setSelectedSensorType] =
+    React.useState<SensorType>('voltage');
 
   // Extract unique vessel IDs from data
   const uniqueVessels = React.useMemo(() => {
-    const vessels = new Set(batteryData.map(item => item.vesselId));
+    const vessels = new Set(sensorData.map((item) => item.vesselId));
     return Array.from(vessels);
-  }, [batteryData]);
+  }, [sensorData]);
 
   // Get the sensor unit for the selected type
   const selectedSensorUnit = React.useMemo(() => {
-    return sensorTypes.find(s => s.id === selectedSensorType)?.unit || 'V';
+    return chartConfig[selectedSensorType]?.unit || 'V';
   }, [selectedSensorType]);
 
   // Get display name for selected sensor
   const selectedSensorLabel = React.useMemo(() => {
-    return sensorTypes.find(s => s.id === selectedSensorType)?.label || 'Battery';
+    return chartConfig[selectedSensorType]?.label || 'Battery';
   }, [selectedSensorType]);
 
   const filteredData = React.useMemo(() => {
@@ -94,14 +104,15 @@ export function ChartAreaInteractive({ batteryData = [] }: { batteryData: Sensor
     const cutoffDate = new Date();
     cutoffDate.setDate(cutoffDate.getDate() - days);
 
-    return batteryData.filter(item => {
+    return sensorData.filter((item) => {
       // Filter by date
       const dateFilter = new Date(item.date) >= cutoffDate;
 
       // Filter by vessel if not "all"
-      const vesselFilter = selectedVessel === 'all' || item.vesselId === selectedVessel;
+      const vesselFilter =
+        selectedVessel === 'all' || item.vesselId === selectedVessel;
 
-      // Simplified type filtering - match exactly what was selected or handle the special battery/voltage case
+      // Type filtering with special handling for battery/voltage
       const typeFilter =
         item.type === selectedSensorType ||
         (selectedSensorType === 'voltage' && item.type === 'battery') ||
@@ -109,26 +120,26 @@ export function ChartAreaInteractive({ batteryData = [] }: { batteryData: Sensor
 
       return dateFilter && vesselFilter && typeFilter;
     });
-  }, [batteryData, timeRange, selectedVessel, selectedSensorType]);
+  }, [sensorData, timeRange, selectedVessel, selectedSensorType]);
 
   return (
     <Card className='@container/card'>
       <CardHeader>
-        <div className="flex flex-col gap-2">
-          <div className="flex items-center justify-between">
-            <CardTitle className="flex-grow">
-              <div className="flex gap-2 items-center">
+        <div className='flex flex-col gap-2'>
+          <div className='flex items-center justify-between'>
+            <CardTitle className='flex-grow'>
+              <div className='flex items-center gap-2'>
                 <span>{selectedSensorLabel} Data</span>
               </div>
             </CardTitle>
-            <div className="flex gap-2 mr-2">
+            <div className='mr-2 flex gap-2'>
               <Select value={selectedVessel} onValueChange={setSelectedVessel}>
-                <SelectTrigger className="w-32" size="sm">
-                  <SelectValue placeholder="All Vessels" />
+                <SelectTrigger className='w-32' size='sm'>
+                  <SelectValue placeholder='All Vessels' />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="all">All Vessels</SelectItem>
-                  {uniqueVessels.map(vesselId => (
+                  <SelectItem value='all'>All Vessels</SelectItem>
+                  {uniqueVessels.map((vesselId) => (
                     <SelectItem key={vesselId} value={vesselId}>
                       Vessel {vesselId}
                     </SelectItem>
@@ -136,12 +147,17 @@ export function ChartAreaInteractive({ batteryData = [] }: { batteryData: Sensor
                 </SelectContent>
               </Select>
 
-              <Select value={selectedSensorType} onValueChange={setSelectedSensorType}>
-                <SelectTrigger className="w-32" size="sm">
-                  <SelectValue placeholder="Battery" />
+              <Select
+                value={selectedSensorType}
+                onValueChange={(value) =>
+                  setSelectedSensorType(value as SensorType)
+                }
+              >
+                <SelectTrigger className='w-32' size='sm'>
+                  <SelectValue placeholder='Battery' />
                 </SelectTrigger>
                 <SelectContent>
-                  {sensorTypes.map(sensor => (
+                  {sensorTypes.map((sensor) => (
                     <SelectItem key={sensor.id} value={sensor.id}>
                       {sensor.label}
                     </SelectItem>
@@ -238,12 +254,14 @@ export function ChartAreaInteractive({ batteryData = [] }: { batteryData: Sensor
                       day: 'numeric',
                       year: 'numeric',
                       hour: '2-digit',
-                      minute: '2-digit'
+                      minute: '2-digit',
                     });
                   }}
                   indicator='dot'
                   formatter={(value) => (
-                    <span>{value.toFixed(2)} {selectedSensorUnit}</span>
+                    <span>
+                      {value} {selectedSensorUnit}
+                    </span>
                   )}
                 />
               }

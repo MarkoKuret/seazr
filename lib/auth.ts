@@ -24,7 +24,7 @@ export async function getSessionApi() {
   return session;
 }
 
-export async function signUpApi(name:string, email: string, password: string) {
+export async function signUpApi(name: string, email: string, password: string) {
   try {
     await auth.api.signUpEmail({
       body: {

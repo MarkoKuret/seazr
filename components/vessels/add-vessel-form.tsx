@@ -8,15 +8,27 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
-import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
+import {
+  Form,
+  FormControl,
+  FormDescription,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from '@/components/ui/form';
 import { addVessel } from '@/server/vessel-action';
 import { SheetClose } from '@/components/ui/sheet';
 import { toast } from 'sonner';
 
 const vesselSchema = z.object({
-  name: z.string().min(1, { message: "Vessel name is required" }),
-  shortId: z.string().length(5, { message: "ShortID must be exactly 5 characters" })
-    .regex(/^[0-9a-fA-F]{5}$/, { message: "ShortID must be a 5-digit hexadecimal number" }),
+  name: z.string().min(1, { message: 'Vessel name is required' }),
+  shortId: z
+    .string()
+    .length(5, { message: 'ShortID must be exactly 5 characters' })
+    .regex(/^[0-9a-fA-F]{5}$/, {
+      message: 'ShortID must be a 5-digit hexadecimal number',
+    }),
   description: z.string().optional(),
 });
 
@@ -59,15 +71,15 @@ export function AddVesselForm({ userId }: { userId: string }) {
 
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6 pt-6">
+      <form onSubmit={form.handleSubmit(onSubmit)} className='space-y-6 pt-6'>
         <FormField
           control={form.control}
-          name="name"
+          name='name'
           render={({ field }) => (
             <FormItem>
               <FormLabel>Vessel Name</FormLabel>
               <FormControl>
-                <Input placeholder="My Boat" {...field} />
+                <Input placeholder='My Boat' {...field} />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -76,12 +88,12 @@ export function AddVesselForm({ userId }: { userId: string }) {
 
         <FormField
           control={form.control}
-          name="shortId"
+          name='shortId'
           render={({ field }) => (
             <FormItem>
               <FormLabel>Vessel ID</FormLabel>
               <FormControl>
-                <Input placeholder="a1b2c" {...field} />
+                <Input placeholder='a1b2c' {...field} />
               </FormControl>
               <FormDescription>
                 Enter the 5-digit hex ID provided with your device
@@ -93,23 +105,28 @@ export function AddVesselForm({ userId }: { userId: string }) {
 
         <FormField
           control={form.control}
-          name="description"
+          name='description'
           render={({ field }) => (
             <FormItem>
               <FormLabel>Description (Optional)</FormLabel>
               <FormControl>
-                <Textarea placeholder="Tell us about your vessel..." {...field} />
+                <Textarea
+                  placeholder='Tell us about your vessel...'
+                  {...field}
+                />
               </FormControl>
               <FormMessage />
             </FormItem>
           )}
         />
 
-        <div className="flex gap-3 justify-end">
+        <div className='flex justify-end gap-3'>
           <SheetClose asChild>
-            <Button type="button" variant="outline">Cancel</Button>
+            <Button type='button' variant='outline'>
+              Cancel
+            </Button>
           </SheetClose>
-          <Button type="submit" disabled={isSubmitting}>
+          <Button type='submit' disabled={isSubmitting}>
             {isSubmitting ? 'Adding...' : 'Add Vessel'}
           </Button>
         </div>

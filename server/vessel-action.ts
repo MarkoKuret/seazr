@@ -11,7 +11,7 @@ export async function getUserVessels(userId: string) {
       },
     });
 
-    return permissions.map(p => p.vessel);
+    return permissions.map((p) => p.vessel);
   } catch (error) {
     console.error('Failed to fetch vessels', error);
     return [];
