@@ -50,7 +50,7 @@ export interface Vessel {
   id: string;
   shortId: string;
   name: string;
-  description?: string;
+  description?: string | null;
 }
 
 /**

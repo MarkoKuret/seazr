@@ -3,7 +3,6 @@ import { getSession } from '@/server/auth-action';
 import { getUserVessels } from '@/server/vessel-action';
 import { AppSidebar } from '@/components/app-sidebar';
 import { SidebarInset, SidebarProvider } from '@/components/ui/sidebar';
-import { Vessel } from '@/types';
 
 export default async function AuthenticatedLayout({
   children,
@@ -16,12 +15,7 @@ export default async function AuthenticatedLayout({
     redirect('/login');
   }
 
-  const vessels: Vessel[] = (await getUserVessels(session.user.id)).map(
-    (v) => ({
-      ...v,
-      description: v.description === null ? undefined : v.description,
-    })
-  );
+  const vessels = await getUserVessels(session.user.id);
 
   return (
     <SidebarProvider

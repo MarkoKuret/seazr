@@ -1,8 +1,9 @@
 'use server';
 
 import { prisma } from '@/lib/prisma';
+import { Vessel } from '@prisma/client';
 
-export async function getUserVessels(userId: string) {
+export async function getUserVessels(userId: string): Promise<Vessel[]> {
   try {
     const permissions = await prisma.permission.findMany({
       where: { userId },
