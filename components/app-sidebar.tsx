@@ -7,17 +7,18 @@ import { usePathname } from 'next/navigation';
 import {
   IconChartBar,
   IconDashboard,
-  IconDatabase,
   IconHelp,
   IconReport,
   IconSearch,
   IconSettings,
+  IconAnchor,
 } from '@tabler/icons-react';
 
 import { NavDocuments } from '@/components/nav-documents';
 import { NavMain } from '@/components/nav-main';
 import { NavSecondary } from '@/components/nav-secondary';
 import { NavUser } from '@/components/nav-user';
+import { NavVessels } from '@/components/nav-vessels';
 import {
   Sidebar,
   SidebarContent,
@@ -27,6 +28,7 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
 } from '@/components/ui/sidebar';
+import { Vessel } from '@/types';
 
 const data = {
   user: {
@@ -66,8 +68,8 @@ const data = {
   management: [
     {
       name: 'Manage Vessels',
-      url: '/vessels', // Update this URL
-      icon: IconDatabase,
+      url: '/manage',
+      icon: IconAnchor,
     },
     {
       name: 'Reports',
@@ -77,7 +79,6 @@ const data = {
   ],
 };
 
-// makni usera u djeljen fajl !?
 interface User {
   name: string;
   email: string;
@@ -86,9 +87,14 @@ interface User {
 
 export function AppSidebar({
   user,
+  vessels = [],
   ...props
-}: React.ComponentProps<typeof Sidebar> & { user: User }) {
+}: React.ComponentProps<typeof Sidebar> & {
+  user: User;
+  vessels?: Vessel[];
+}) {
   const pathname = usePathname();
+
   return (
     <Sidebar collapsible='offcanvas' {...props}>
       <SidebarHeader>
@@ -113,6 +119,7 @@ export function AppSidebar({
       </SidebarHeader>
       <SidebarContent>
         <NavMain items={data.navMain} currentPath={pathname} />
+        <NavVessels vessels={vessels} currentPath={pathname} />
         <NavDocuments items={data.management} currentPath={pathname} />
         <NavSecondary items={data.navSecondary} className='mt-auto' />
       </SidebarContent>

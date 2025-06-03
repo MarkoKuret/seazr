@@ -29,7 +29,8 @@ function getMeasurementsForType(sensorType: SensorType): string[] {
     temperature: ['temperature'],
     humidity: ['humidity'],
     pressure: ['pressure'],
-    water_level: ['water_level'],
+    water: ['water'],
+    fuel: ['fuel'],
   };
 
   return sensorTypeMap[sensorType] || [sensorType];
@@ -45,7 +46,8 @@ export function getUnitForSensorType(type: string): SensorUnit {
     temperature: '°C',
     humidity: '%',
     pressure: 'hPa',
-    water_level: '%',
+    water: 'L',
+    fuel: 'L',
   };
 
   return typeToUnit[type as SensorType] || 'V';

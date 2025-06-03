@@ -8,11 +8,11 @@ export type SensorType =
   | 'temperature'
   | 'humidity'
   | 'pressure'
-  | 'water_level'
+  | 'water'
+  | 'fuel'
   | 'battery';
 
-// All possible sensor units
-export type SensorUnit = 'V' | '°C' | '%' | 'hPa';
+export type SensorUnit = 'V' | '°C' | 'L' | '%' | 'hPa';
 
 // Single sensor reading model
 export interface SensorReading {
@@ -51,8 +51,6 @@ export interface Vessel {
   shortId: string;
   name: string;
   description?: string;
-  createdAt: string;
-  updatedAt: string;
 }
 
 /**

@@ -41,23 +41,28 @@ const chartConfig: ChartConfigMap = {
   },
   temperature: {
     label: 'Temperature',
-    color: '#f97316', // Orange for temperature
+    color: '#f97316', // Orange
     unit: '°C',
   },
   humidity: {
     label: 'Humidity',
-    color: '#3b82f6', // Blue for humidity
+    color: '#3b82f6', // Blue
     unit: '%',
   },
   pressure: {
     label: 'Pressure',
-    color: '#8b5cf6', // Purple for pressure
+    color: '#8b5cf6', // Purple
     unit: 'hPa',
   },
-  water_level: {
+  water: {
     label: 'Water Level',
-    color: '#06b6d4', // Cyan for water level
+    color: '#06b6d4', // Cyan
     unit: '%',
+  },
+  fuel: {
+    label: 'Fuel Level',
+    color: '#005F6A', // Petrol
+    unit: 'L',
   },
 };
 
@@ -67,7 +72,7 @@ const sensorTypes = [
   { id: 'temperature', label: 'Temperature', unit: '°C' },
   { id: 'humidity', label: 'Humidity', unit: '%' },
   { id: 'pressure', label: 'Pressure', unit: 'hPa' },
-  { id: 'water_level', label: 'Water Level', unit: '%' },
+  { id: 'water', label: 'Water Level', unit: '%' },
 ];
 
 interface ChartAreaInteractiveProps {
