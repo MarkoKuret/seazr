@@ -40,20 +40,27 @@ async function VesselSensorCards({ vesselId }: { vesselId: string }) {
   }
 }
 
-async function VesselSensorChart({ vesselId }: { vesselId: string }) {
+async function VesselSensorChart({ vesselShortId }: { vesselShortId: string }) {
   const session = await getSession();
   if (!session?.user) {
     redirect('/login');
   }
 
   try {
-    const sensorData = await getSensorHistory(
-      session.user.id,
-      'voltage' as SensorType,
-      90,
-      vesselId
+    // Create an array to hold promises for all sensor types
+    const sensorTypes: SensorType[] = ['voltage', 'temperature', 'humidity', 'pressure', 'water', 'fuel', 'battery'];
+
+    const sensorDataPromises = sensorTypes.map(type =>
+      getSensorHistory(session.user.id, type, 30, vesselShortId)
     );
-    return <ChartAreaInteractive sensorData={sensorData} />;
+
+    // Wait for all requests to complete
+    const allSensorData = await Promise.all(sensorDataPromises);
+
+    // Merge all sensor data into a single array
+    const combinedSensorData = allSensorData.flat();
+
+    return <ChartAreaInteractive sensorData={combinedSensorData} />;
   } catch (error) {
     console.error('Error fetching vessel sensor history:', error);
     return (
@@ -87,7 +94,7 @@ export default async function VesselPage({
                   <div className='bg-muted h-[250px] animate-pulse rounded-lg'></div>
                 }
               >
-                <VesselSensorChart vesselId={vesselShortId} />
+                <VesselSensorChart vesselShortId={vesselShortId} />
               </Suspense>
             </div>
           </div>

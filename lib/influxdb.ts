@@ -1,5 +1,6 @@
 import { InfluxDBClient } from '@influxdata/influxdb3-client';
-import { InfluxRecord, SensorReading, SensorType, SensorUnit } from '@/types';
+import { InfluxRecord, SensorReading, SensorType } from '@/types';
+import { getUnitForSensorType } from '@/lib/utils';
 
 // Configuration - ideally moved to a separate config service
 const host = process.env.INFLUX_HOST || 'http://localhost';
@@ -14,7 +15,7 @@ let client: InfluxDBClient | null = null;
  */
 function getInfluxClient(): InfluxDBClient {
   if (!client) {
-    client = new InfluxDBClient({ host, token, database });
+    client = new InfluxDBClient({ host, token, database }); //?! provjerit jeli ovo najbolji način
   }
   return client;
 }
@@ -34,23 +35,6 @@ function getMeasurementsForType(sensorType: SensorType): string[] {
   };
 
   return sensorTypeMap[sensorType] || [sensorType];
-}
-
-/**
- * Get the appropriate unit for a sensor type
- */
-export function getUnitForSensorType(type: string): SensorUnit {
-  const typeToUnit: Record<string, SensorUnit> = {
-    voltage: 'V',
-    battery: 'V',
-    temperature: '°C',
-    humidity: '%',
-    pressure: 'hPa',
-    water: 'L',
-    fuel: 'L',
-  };
-
-  return typeToUnit[type as SensorType] || 'V';
 }
 
 /**
@@ -106,7 +90,7 @@ export async function getAllSensorData(
       value: row._value,
       time: row._time,
       vesselId: row.vesselId,
-      unit: getUnitForSensorType(row.sensorType),
+      unit: getUnitForSensorType(row.sensorType as SensorType),
     }));
   } catch (error) {
     console.error('Error fetching all sensor data:', error);
@@ -114,16 +98,16 @@ export async function getAllSensorData(
   }
 }
 
-/**
- * Get historical data for battery/voltage sensors
- * @deprecated Use getSensorHistoryData with type='voltage' instead
- */
-export async function getBatteryHistoryData(
-  vesselShortIds: string[],
-  days: number = 30
-): Promise<InfluxRecord[]> {
-  return getSensorHistoryData(vesselShortIds, 'voltage', days);
-}
+// /**
+//  * Get historical data for battery/voltage sensors
+//  * @deprecated Use getSensorHistoryData with type='voltage' instead
+//  */
+// export async function getBatteryHistoryData(
+//   vesselShortIds: string[],
+//   days: number = 30
+// ): Promise<InfluxRecord[]> {
+//   return getSensorHistoryData(vesselShortIds, 'voltage', days);
+// }
 
 /**
  * Get historical data for any sensor type
@@ -132,7 +116,7 @@ export async function getSensorHistoryData(
   vesselShortIds: string[],
   sensorType: SensorType = 'voltage',
   days: number = 30
-): Promise<InfluxRecord[]> {
+): Promise<SensorReading[]> {
   if (vesselShortIds.length === 0) return [];
 
   try {
@@ -152,7 +136,15 @@ export async function getSensorHistoryData(
       ORDER BY time ASC
     `;
 
-    return await executeQuery(sqlQuery);
+    const rows = await executeQuery(sqlQuery);
+
+    return rows.map((point) => ({
+        time: new Date(point._time).toISOString(),
+        value: point._value,
+        vesselId: point.vesselId,
+        type: sensorType,
+        unit: getUnitForSensorType(sensorType),
+      }))
   } catch (error) {
     console.error(`Error fetching ${sensorType} history data:`, error);
     return [];

@@ -1,5 +1,6 @@
 'use client';
 
+import { useState } from 'react';
 import {
   Card,
   CardDescription,
@@ -8,6 +9,41 @@ import {
   CardTitle,
 } from '@/components/ui/card';
 import { SensorReading } from '@/types';
+
+// Helper component for sensor cards with hover state
+function SensorCard({ sensor }: { sensor: SensorReading }) {
+  const [isHovered, setIsHovered] = useState(false);
+
+  return (
+    <Card
+      className='@container/card transition-all duration-200'
+      onMouseEnter={() => setIsHovered(true)}
+      onMouseLeave={() => setIsHovered(false)}
+    >
+      <CardHeader>
+        <CardDescription>
+          {sensor.type.toUpperCase()}
+          <span
+            className={`ml-1 transition-opacity duration-200 ${
+              isHovered ? 'opacity-100' : 'opacity-0'
+            }`}
+            aria-hidden={!isHovered}
+          >
+            - {sensor.id}
+          </span>
+        </CardDescription>
+        <CardTitle className='text-2xl font-semibold tabular-nums @[250px]/card:text-3xl'>
+          {sensor.value.toFixed(2)} {sensor.unit}
+        </CardTitle>
+      </CardHeader>
+      <CardFooter className='flex-col items-start gap-1.5 text-sm'>
+        <div className='text-muted-foreground'>
+          Updated: {new Date(sensor.time).toLocaleTimeString('hr-HR')}
+        </div>
+      </CardFooter>
+    </Card>
+  );
+}
 
 interface SectionCardsProps {
   sensors: SensorReading[];
@@ -47,19 +83,7 @@ export function SectionCards({
   return (
     <div className='*:data-[slot=card]:from-primary/5 *:data-[slot=card]:to-card dark:*:data-[slot=card]:bg-card grid grid-cols-1 gap-4 px-4 *:data-[slot=card]:bg-gradient-to-t *:data-[slot=card]:shadow-xs lg:px-6 @xl/main:grid-cols-2 @5xl/main:grid-cols-4'>
       {sensors.map((sensor) => (
-        <Card key={sensor.id} className='@container/card'>
-          <CardHeader>
-            <CardDescription>{sensor.type.toUpperCase()}</CardDescription>
-            <CardTitle className='text-2xl font-semibold tabular-nums @[250px]/card:text-3xl'>
-              {sensor.value.toFixed(2)} {sensor.unit}
-            </CardTitle>
-          </CardHeader>
-          <CardFooter className='flex-col items-start gap-1.5 text-sm'>
-            <div className='text-muted-foreground'>
-              Updated: {new Date(sensor.time).toLocaleTimeString('hr-HR')}
-            </div>
-          </CardFooter>
-        </Card>
+        <SensorCard key={sensor.id} sensor={sensor} />
       ))}
 
       {/* Display placeholder cards if we have fewer than minCards sensors */}

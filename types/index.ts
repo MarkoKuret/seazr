@@ -10,13 +10,31 @@ export type SensorType =
   | 'pressure'
   | 'water'
   | 'fuel'
-  | 'battery';
+  | 'battery'; //?! enum
 
 export type SensorUnit = 'V' | '°C' | 'L' | '%' | 'hPa';
 
-// Single sensor reading model
+export function getSensorUnit(type: SensorType): SensorUnit {
+  switch (type) {
+    case 'voltage':
+    case 'battery':
+      return 'V';
+    case 'temperature':
+      return '°C';
+    case 'humidity':
+      return '%';
+    case 'pressure':
+      return 'hPa';
+    case 'water':
+    case 'fuel':
+      return 'L';
+    default:
+      return 'V';
+  }
+}
+
 export interface SensorReading {
-  id: string;
+  id?: string;
   type: SensorType;
   value: number;
   time: string;
@@ -24,23 +42,14 @@ export interface SensorReading {
   unit: SensorUnit;
 }
 
-// Historical data point for charts
-export interface SensorHistoryPoint {
-  date: string;
-  value: number;
-  vesselId: string;
-  type: SensorType;
-}
-
-// Raw data returned from InfluxDB
 export interface InfluxRecord {
   _time: string;
   _value: number;
   vesselId: string;
   sensorType: string;
   sensorId?: string;
-  time?: string; // Some queries return time instead of _time
-  value?: number; // Some queries return value instead of _value
+  time?: string;
+  value?: number; //?! neke vracaju valu i time u razlicitim formatima
 }
 
 /**
@@ -74,7 +83,3 @@ export interface ChartSensorConfig {
   color: string;
   unit: SensorUnit;
 }
-
-export type ChartConfigMap = {
-  [key in SensorType]: ChartSensorConfig;
-};

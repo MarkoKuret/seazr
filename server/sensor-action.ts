@@ -1,14 +1,12 @@
-// app/actions/sensor-data.ts
 'use server';
 
 import {
   getAllSensorData,
-  getBatteryHistoryData,
-  getSensorHistoryData as fetchSensorHistoryData,
+  getSensorHistoryData,
 } from '@/lib/influxdb';
 import { prisma } from '@/lib/prisma';
-import { SensorHistoryPoint, SensorReading, SensorType } from '@/types';
-
+import { SensorReading, SensorType } from '@/types';
+import { getUnitForSensorType } from '@/lib/utils';
 /**
  * Gets vessels shortIds a user has permission to access
  * @private utility function
@@ -49,34 +47,8 @@ export async function getAllSensorValues(
       return await getAllSensorData([vesselId]);
     }
 
-    // Otherwise get data for all vessels the user has access to
     const vesselShortIds = await getUserVesselShortIds(userId);
     return await getAllSensorData(vesselShortIds);
-  } catch (error: unknown) {
-    const message =
-      error instanceof Error ? error.message : 'Unknown error occurred';
-    throw new Error(message);
-  }
-}
-
-/**
- * Get battery history for a user's permitted vessels
- * @deprecated Use getSensorHistory with type='voltage' instead
- */
-export async function getBatteryHistory(
-  userId: string,
-  days: number = 30
-): Promise<SensorHistoryPoint[]> {
-  try {
-    const vesselShortIds = await getUserVesselShortIds(userId);
-    const rawData = await getBatteryHistoryData(vesselShortIds, days);
-
-    return rawData.map((point) => ({
-      date: new Date(point._time).toISOString(),
-      value: point._value,
-      vesselId: point.vesselId,
-      type: 'voltage' as SensorType,
-    }));
   } catch (error: unknown) {
     const message =
       error instanceof Error ? error.message : 'Unknown error occurred';
@@ -96,45 +68,24 @@ export async function getSensorHistory(
   sensorType: SensorType = 'voltage',
   days: number = 30,
   vesselId?: string
-): Promise<SensorHistoryPoint[]> {
+): Promise<SensorReading[]> {
   try {
-    // If vesselId is provided, just use that (after verifying permissions)
     if (vesselId) {
       const hasPermission = await checkUserVesselPermission(userId, vesselId);
       if (!hasPermission) {
         throw new Error('You do not have permission to access this vessel');
       }
 
-      // Get the raw data from the influxdb layer
-      const data = await fetchSensorHistoryData([vesselId], sensorType, days);
-
-      // Format the data for the chart
-      return data.map((point) => ({
-        date: new Date(point._time).toISOString(),
-        value: point._value,
-        vesselId: point.vesselId,
-        type: sensorType,
-      }));
+      return await getSensorHistoryData([vesselId], sensorType, days);
     }
 
-    // Otherwise get data for all vessels the user has access to
     const vesselShortIds = await getUserVesselShortIds(userId);
 
-    // If no permissions, return empty array
     if (vesselShortIds.length === 0) {
       return [];
     }
 
-    // Get the raw data from the influxdb layer
-    const data = await fetchSensorHistoryData(vesselShortIds, sensorType, days);
-
-    // Format the data for the chart
-    return data.map((point) => ({
-      date: new Date(point._time).toISOString(),
-      value: point._value,
-      vesselId: point.vesselId,
-      type: sensorType,
-    }));
+    return await getSensorHistoryData(vesselShortIds, sensorType, days);
   } catch (error: unknown) {
     console.error('Error fetching sensor history:', error);
     const message =
@@ -143,7 +94,6 @@ export async function getSensorHistory(
   }
 }
 
-// Add a helper function to check if a user has permission to access a vessel
 async function checkUserVesselPermission(
   userId: string,
   vesselId: string

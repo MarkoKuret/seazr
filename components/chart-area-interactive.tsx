@@ -25,58 +25,14 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group';
-import { ChartConfigMap, SensorHistoryPoint, SensorType } from '@/types';
+import { SensorReading, SensorType } from '@/types';
+import { getUnitForSensorType, getSensorTypeLabel, getSensorTypeColor } from '@/lib/utils';
 
-// Define the chart config for different sensor types
-const chartConfig: ChartConfigMap = {
-  voltage: {
-    label: 'Battery',
-    color: '#4ade80', // Green color for battery
-    unit: 'V',
-  },
-  battery: {
-    label: 'Battery',
-    color: '#4ade80',
-    unit: 'V',
-  },
-  temperature: {
-    label: 'Temperature',
-    color: '#f97316', // Orange
-    unit: '°C',
-  },
-  humidity: {
-    label: 'Humidity',
-    color: '#3b82f6', // Blue
-    unit: '%',
-  },
-  pressure: {
-    label: 'Pressure',
-    color: '#8b5cf6', // Purple
-    unit: 'hPa',
-  },
-  water: {
-    label: 'Water Level',
-    color: '#06b6d4', // Cyan
-    unit: '%',
-  },
-  fuel: {
-    label: 'Fuel Level',
-    color: '#005F6A', // Petrol
-    unit: 'L',
-  },
-};
-
-// Define available sensor types
-const sensorTypes = [
-  { id: 'voltage', label: 'Battery', unit: 'V' },
-  { id: 'temperature', label: 'Temperature', unit: '°C' },
-  { id: 'humidity', label: 'Humidity', unit: '%' },
-  { id: 'pressure', label: 'Pressure', unit: 'hPa' },
-  { id: 'water', label: 'Water Level', unit: '%' },
-];
+// Available sensor types for the dropdown
+const SENSOR_TYPES: SensorType[] = ['voltage', 'temperature', 'humidity', 'pressure', 'water', 'fuel', 'battery'];
 
 interface ChartAreaInteractiveProps {
-  sensorData: SensorHistoryPoint[];
+  sensorData: SensorReading[];
 }
 
 export function ChartAreaInteractive({
@@ -84,38 +40,51 @@ export function ChartAreaInteractive({
 }: ChartAreaInteractiveProps) {
   const isMobile = useIsMobile();
   const [timeRange, setTimeRange] = React.useState('30d');
-  const [selectedVessel, setSelectedVessel] = React.useState<string>('all');
+  const [selectedVessel] = React.useState<string>('all');
   const [selectedSensorType, setSelectedSensorType] =
     React.useState<SensorType>('voltage');
 
-  // Extract unique vessel IDs from data
-  const uniqueVessels = React.useMemo(() => {
-    const vessels = new Set(sensorData.map((item) => item.vesselId));
-    return Array.from(vessels);
-  }, [sensorData]);
-
   // Get the sensor unit for the selected type
-  const selectedSensorUnit = React.useMemo(() => {
-    return chartConfig[selectedSensorType]?.unit || 'V';
-  }, [selectedSensorType]);
+  const selectedSensorUnit = React.useMemo(() =>
+    getUnitForSensorType(selectedSensorType),
+    [selectedSensorType]
+  );
 
   // Get display name for selected sensor
-  const selectedSensorLabel = React.useMemo(() => {
-    return chartConfig[selectedSensorType]?.label || 'Battery';
-  }, [selectedSensorType]);
+  const selectedSensorLabel = React.useMemo(() =>
+    getSensorTypeLabel(selectedSensorType),
+    [selectedSensorType]
+  );
+
+  // Get sensor color for visualization
+  const sensorColor = React.useMemo(() =>
+    getSensorTypeColor(selectedSensorType),
+    [selectedSensorType]
+  );
+
+  // Create chart config for the selected sensor
+  const chartConfig = React.useMemo(() => ({
+    [selectedSensorType]: {
+      label: selectedSensorLabel,
+      color: sensorColor,
+      unit: selectedSensorUnit
+    }
+  }), [selectedSensorType, selectedSensorLabel, sensorColor, selectedSensorUnit]);
 
   const filteredData = React.useMemo(() => {
-    const days = timeRange === '90d' ? 90 : timeRange === '30d' ? 30 : 7;
-    const cutoffDate = new Date();
-    cutoffDate.setDate(cutoffDate.getDate() - days);
+    let cutoffDate = new Date();
+
+    if (timeRange === '30d') {
+      cutoffDate.setDate(cutoffDate.getDate() - 30);
+    } else if (timeRange === '7d') {
+      cutoffDate.setDate(cutoffDate.getDate() - 7);
+    } else if (timeRange === '1d') {
+      cutoffDate.setDate(cutoffDate.getDate() - 1);
+    }
 
     return sensorData.filter((item) => {
       // Filter by date
-      const dateFilter = new Date(item.date) >= cutoffDate;
-
-      // Filter by vessel if not "all"
-      const vesselFilter =
-        selectedVessel === 'all' || item.vesselId === selectedVessel;
+      const dateFilter = new Date(item.time) >= cutoffDate;
 
       // Type filtering with special handling for battery/voltage
       const typeFilter =
@@ -123,7 +92,7 @@ export function ChartAreaInteractive({
         (selectedSensorType === 'voltage' && item.type === 'battery') ||
         (item.type === 'voltage' && selectedSensorType === 'battery');
 
-      return dateFilter && vesselFilter && typeFilter;
+      return dateFilter && typeFilter;
     });
   }, [sensorData, timeRange, selectedVessel, selectedSensorType]);
 
@@ -134,37 +103,23 @@ export function ChartAreaInteractive({
           <div className='flex items-center justify-between'>
             <CardTitle className='flex-grow'>
               <div className='flex items-center gap-2'>
-                <span>{selectedSensorLabel} Data</span>
+                <span>{selectedSensorLabel}</span>
               </div>
             </CardTitle>
             <div className='mr-2 flex gap-2'>
-              <Select value={selectedVessel} onValueChange={setSelectedVessel}>
-                <SelectTrigger className='w-32' size='sm'>
-                  <SelectValue placeholder='All Vessels' />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value='all'>All Vessels</SelectItem>
-                  {uniqueVessels.map((vesselId) => (
-                    <SelectItem key={vesselId} value={vesselId}>
-                      Vessel {vesselId}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-
               <Select
                 value={selectedSensorType}
                 onValueChange={(value) =>
                   setSelectedSensorType(value as SensorType)
                 }
               >
-                <SelectTrigger className='w-32' size='sm'>
-                  <SelectValue placeholder='Battery' />
+                <SelectTrigger className='w-24 md:w-32' size='sm'>
+                  <SelectValue placeholder={getSensorTypeLabel('voltage')} />
                 </SelectTrigger>
                 <SelectContent>
-                  {sensorTypes.map((sensor) => (
-                    <SelectItem key={sensor.id} value={sensor.id}>
-                      {sensor.label}
+                  {SENSOR_TYPES.map((type) => (
+                    <SelectItem key={type} value={type}>
+                      {getSensorTypeLabel(type)}
                     </SelectItem>
                   ))}
                 </SelectContent>
@@ -172,7 +127,7 @@ export function ChartAreaInteractive({
             </div>
           </div>
           <CardDescription>
-            <span className='hidden @[540px]/card:block'>
+            <span className='hidden @[540px]/card:block'> {/* ?! */}
               {selectedSensorLabel} readings over time
               {selectedVessel !== 'all' && ` for vessel ${selectedVessel}`}
             </span>
@@ -187,27 +142,27 @@ export function ChartAreaInteractive({
             variant='outline'
             className='hidden *:data-[slot=toggle-group-item]:!px-4 @[767px]/card:flex'
           >
-            <ToggleGroupItem value='90d'>Last 3 months</ToggleGroupItem>
-            <ToggleGroupItem value='30d'>Last 30 days</ToggleGroupItem>
-            <ToggleGroupItem value='7d'>Last 7 days</ToggleGroupItem>
+            <ToggleGroupItem value='30d'>30 days</ToggleGroupItem>
+            <ToggleGroupItem value='7d'>7 days</ToggleGroupItem>
+            <ToggleGroupItem value='1d'>24 hours</ToggleGroupItem>
           </ToggleGroup>
           <Select value={timeRange} onValueChange={setTimeRange}>
             <SelectTrigger
-              className='flex w-40 **:data-[slot=select-value]:block **:data-[slot=select-value]:truncate @[767px]/card:hidden'
+              className='flex w-22 **:data-[slot=select-value]:block **:data-[slot=select-value]:truncate @[767px]/card:hidden'
               size='sm'
               aria-label='Select a time range'
             >
-              <SelectValue placeholder='Last 30 days' />
+              <SelectValue placeholder='30 days' />
             </SelectTrigger>
             <SelectContent className='rounded-xl'>
-              <SelectItem value='90d' className='rounded-lg'>
-                Last 3 months
-              </SelectItem>
               <SelectItem value='30d' className='rounded-lg'>
-                Last 30 days
+                30 d
               </SelectItem>
               <SelectItem value='7d' className='rounded-lg'>
-                Last 7 days
+                7 d
+              </SelectItem>
+              <SelectItem value='1d' className='rounded-lg'>
+                24 h
               </SelectItem>
             </SelectContent>
           </Select>
@@ -215,27 +170,27 @@ export function ChartAreaInteractive({
       </CardHeader>
       <CardContent className='px-2 pt-4 sm:px-6 sm:pt-6'>
         <ChartContainer
-          config={chartConfig}
           className='aspect-auto h-[250px] w-full'
+          config={chartConfig}
         >
           <AreaChart data={filteredData}>
             <defs>
               <linearGradient id='fillSensor' x1='0' y1='0' x2='0' y2='1'>
                 <stop
                   offset='5%'
-                  stopColor={`var(--color-${selectedSensorType === 'voltage' ? 'battery' : selectedSensorType})`}
+                  stopColor={sensorColor}
                   stopOpacity={0.8}
                 />
                 <stop
                   offset='95%'
-                  stopColor={`var(--color-${selectedSensorType === 'voltage' ? 'battery' : selectedSensorType})`}
+                  stopColor={sensorColor}
                   stopOpacity={0.1}
                 />
               </linearGradient>
             </defs>
             <CartesianGrid vertical={false} />
             <XAxis
-              dataKey='date'
+              dataKey='time'
               tickLine={false}
               axisLine={false}
               tickMargin={8}
@@ -249,7 +204,7 @@ export function ChartAreaInteractive({
               }}
             />
             <ChartTooltip
-              cursor={false}
+              cursor={true }
               defaultIndex={isMobile ? -1 : 10}
               content={
                 <ChartTooltipContent
@@ -275,7 +230,7 @@ export function ChartAreaInteractive({
               dataKey='value'
               type='monotone'
               fill='url(#fillSensor)'
-              stroke={`var(--color-${selectedSensorType === 'voltage' ? 'battery' : selectedSensorType})`}
+              stroke={sensorColor}
               name={selectedSensorLabel}
             />
           </AreaChart>
