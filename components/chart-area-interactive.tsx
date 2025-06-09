@@ -72,7 +72,7 @@ export function ChartAreaInteractive({
   }), [selectedSensorType, selectedSensorLabel, sensorColor, selectedSensorUnit]);
 
   const filteredData = React.useMemo(() => {
-    let cutoffDate = new Date();
+    const cutoffDate = new Date();
 
     if (timeRange === '30d') {
       cutoffDate.setDate(cutoffDate.getDate() - 30);
@@ -94,7 +94,7 @@ export function ChartAreaInteractive({
 
       return dateFilter && typeFilter;
     });
-  }, [sensorData, timeRange, selectedVessel, selectedSensorType]);
+  }, [sensorData, timeRange, selectedSensorType]);
 
   return (
     <Card className='@container/card'>
