@@ -3,10 +3,11 @@
 import {
   getAllSensorData,
   getSensorHistoryData,
+  getVesselLocationData,
 } from '@/lib/influxdb';
 import { prisma } from '@/lib/prisma';
-import { SensorReading, SensorType } from '@/types';
-import { getUnitForSensorType } from '@/lib/utils';
+import { SensorReading, SensorType, VesselLocation } from '@/types';
+
 /**
  * Gets vessels shortIds a user has permission to access
  * @private utility function
@@ -88,6 +89,80 @@ export async function getSensorHistory(
     return await getSensorHistoryData(vesselShortIds, sensorType, days);
   } catch (error: unknown) {
     console.error('Error fetching sensor history:', error);
+    const message =
+      error instanceof Error ? error.message : 'Unknown error occurred';
+    throw new Error(message);
+  }
+}
+
+/**
+ * Get latest location data for a vessel
+ * @param userId The user ID
+ * @param vesselId Optional vessel ID - if not provided, returns locations for all accessible vessels
+ */
+export async function getVesselLocation(
+  userId: string,
+  vesselId?: string
+): Promise<VesselLocation[]> {
+  try {
+    if (vesselId) {
+      const hasPermission = await checkUserVesselPermission(userId, vesselId);
+      if (!hasPermission) {
+        throw new Error('You do not have permission to access this vessel');
+      }
+
+      const vessel = await prisma.vessel.findUnique({
+        where: { shortId: vesselId },
+        select: { name: true, shortId: true },
+      });
+
+      if (!vessel) {
+        throw new Error('Vessel not found');
+      }
+
+      const locations = await getVesselLocationData([vesselId]);
+
+      // Attach vessel name to location data
+      return locations.map((loc) => ({
+        ...loc,
+        vesselName: vessel.name,
+      }));
+    }
+
+    const permissions = await prisma.permission.findMany({
+      where: { userId },
+      include: {
+        vessel: {
+          select: {
+            shortId: true,
+            name: true,
+          },
+        },
+      },
+    });
+
+    if (permissions.length === 0) {
+      return [];
+    }
+
+    const vesselInfo = permissions.map((p) => ({
+      shortId: p.vessel.shortId,
+      name: p.vessel.name,
+    }));
+
+    const locations = await getVesselLocationData(
+      vesselInfo.map((v) => v.shortId)
+    );
+
+    return locations.map((loc) => {
+      const vessel = vesselInfo.find((v) => v.shortId === loc.vesselId);
+      return {
+        ...loc,
+        vesselName: vessel?.name || 'Unknown Vessel',
+      };
+    });
+  } catch (error: unknown) {
+    console.error('Error fetching vessel location:', error);
     const message =
       error instanceof Error ? error.message : 'Unknown error occurred';
     throw new Error(message);

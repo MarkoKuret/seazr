@@ -48,9 +48,17 @@ async function VesselSensorChart({ vesselShortId }: { vesselShortId: string }) {
 
   try {
     // Create an array to hold promises for all sensor types
-    const sensorTypes: SensorType[] = ['voltage', 'temperature', 'humidity', 'pressure', 'water', 'fuel', 'battery'];
+    const sensorTypes: SensorType[] = [
+      'voltage',
+      'temperature',
+      'humidity',
+      'pressure',
+      'water',
+      'fuel',
+      'battery',
+    ];
 
-    const sensorDataPromises = sensorTypes.map(type =>
+    const sensorDataPromises = sensorTypes.map((type) =>
       getSensorHistory(session.user.id, type, 30, vesselShortId)
     );
 
@@ -76,7 +84,7 @@ export default async function VesselPage({
 }: {
   params: Promise<{ shortId: string }>;
 }) {
-  const vesselShortId = (await params).shortId
+  const vesselShortId = (await params).shortId;
   //const vesselShortId = shortId;
 
   return (

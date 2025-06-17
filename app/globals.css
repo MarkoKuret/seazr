@@ -237,3 +237,29 @@
     @apply bg-background text-foreground;
   }
 }
+
+/* Leaflet map styles */
+.leaflet-container {
+  z-index: 1;
+  height: 100%;
+  width: 100%;
+}
+
+.leaflet-control-container .leaflet-control {
+  border-radius: var(--radius);
+}
+
+.leaflet-control-zoom {
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  overflow: hidden;
+}
+
+.leaflet-control-zoom a {
+  color: var(--foreground);
+  background-color: var(--background);
+}
+
+.leaflet-control-zoom a:hover {
+  background-color: var(--accent);
+}

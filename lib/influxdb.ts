@@ -1,5 +1,10 @@
 import { InfluxDBClient } from '@influxdata/influxdb3-client';
-import { InfluxRecord, SensorReading, SensorType } from '@/types';
+import {
+  InfluxSensor,
+  VesselLocation,
+  SensorReading,
+  SensorType,
+} from '@/types';
 import { getUnitForSensorType } from '@/lib/utils';
 
 // Configuration - ideally moved to a separate config service
@@ -40,10 +45,10 @@ function getMeasurementsForType(sensorType: SensorType): string[] {
 /**
  * Execute a query with error handling
  */
-async function executeQuery(query: string): Promise<InfluxRecord[]> {
+async function executeSesnorQuery(query: string): Promise<InfluxSensor[]> {
   try {
     const client = getInfluxClient();
-    const rows: InfluxRecord[] = [];
+    const rows: InfluxSensor[] = [];
     const result = client.query(query, database);
 
     for await (const row of result) {
@@ -59,7 +64,29 @@ async function executeQuery(query: string): Promise<InfluxRecord[]> {
     return rows;
   } catch (error) {
     console.error('Error executing query:', error);
-    throw error; // Re-throw to allow proper error handling upstream
+    throw error;
+  }
+}
+
+async function executeLocationQuery(query: string): Promise<VesselLocation[]> {
+  try {
+    const client = getInfluxClient();
+    const rows: VesselLocation[] = [];
+    const result = client.query(query, database);
+
+    for await (const row of result) {
+      rows.push({
+        timestamp: row.time || row._time,
+        vesselId: row.vesselId || 'unknown',
+        latitude: row.latitude !== undefined ? parseFloat(row.latitude) : 0,
+        longitude: row.longitude !== undefined ? parseFloat(row.longitude) : 0,
+      });
+    }
+
+    return rows;
+  } catch (error) {
+    console.error('Error executing query:', error);
+    throw error;
   }
 }
 
@@ -81,9 +108,8 @@ export async function getAllSensorData(
       ORDER BY "sensorId", time DESC
     `;
 
-    const rows = await executeQuery(sqlQuery);
+    const rows = await executeSesnorQuery(sqlQuery);
 
-    // Transform raw data to application model
     return rows.map((row) => ({
       id: row.sensorId || row.vesselId + '-' + row.sensorType,
       type: row.sensorType as SensorType,
@@ -105,7 +131,7 @@ export async function getAllSensorData(
 // export async function getBatteryHistoryData(
 //   vesselShortIds: string[],
 //   days: number = 30
-// ): Promise<InfluxRecord[]> {
+// ): Promise<InfluxSensor[]> {
 //   return getSensorHistoryData(vesselShortIds, 'voltage', days);
 // }
 
@@ -136,17 +162,43 @@ export async function getSensorHistoryData(
       ORDER BY time ASC
     `;
 
-    const rows = await executeQuery(sqlQuery);
+    const rows = await executeSesnorQuery(sqlQuery);
 
     return rows.map((point) => ({
-        time: new Date(point._time).toISOString(),
-        value: point._value,
-        vesselId: point.vesselId,
-        type: sensorType,
-        unit: getUnitForSensorType(sensorType),
-      }))
+      time: new Date(point._time).toISOString(),
+      value: point._value,
+      vesselId: point.vesselId,
+      type: sensorType,
+      unit: getUnitForSensorType(sensorType),
+    }));
   } catch (error) {
     console.error(`Error fetching ${sensorType} history data:`, error);
     return [];
+  }
+}
+
+/**
+ * Gets the latest location data for specified vessels
+ * @param vesselIds Array of vessel IDs to fetch locations for
+ */
+export async function getVesselLocationData(
+  vesselShortIds: string[]
+): Promise<VesselLocation[]> {
+  if (vesselShortIds.length === 0) return [];
+  const formattedVesselIds = vesselShortIds.map((id) => `'${id}'`).join(', ');
+
+  try {
+    const sqlQuery = `
+      SELECT DISTINCT ON ("vesselId") "vesselId", latitude, longitude, time
+      FROM "location"
+      WHERE "vesselId" IN (${formattedVesselIds})
+      ORDER BY "vesselId", time DESC
+    `;
+
+    const rows = await executeLocationQuery(sqlQuery);
+    return rows;
+  } catch (error) {
+    console.error('Error querying vessel location data:', error);
+    throw error;
   }
 }

@@ -12,7 +12,7 @@ export type SensorType =
   | 'fuel'
   | 'battery'; //?! enum
 
-export type SensorUnit = 'V' | '°C' | 'L' | '%' | 'hPa';
+export type SensorUnit = 'V' | '°C' | 'L' | '%' | 'hPa' | '';
 
 export function getSensorUnit(type: SensorType): SensorUnit {
   switch (type) {
@@ -42,7 +42,7 @@ export interface SensorReading {
   unit: SensorUnit;
 }
 
-export interface InfluxRecord {
+export interface InfluxSensor {
   _time: string;
   _value: number;
   vesselId: string;
@@ -82,4 +82,12 @@ export interface ChartSensorConfig {
   label: string;
   color: string;
   unit: SensorUnit;
+}
+
+export interface VesselLocation {
+  vesselId: string;
+  vesselName?: string;
+  latitude: number;
+  longitude: number;
+  timestamp: string;
 }

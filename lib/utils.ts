@@ -7,7 +7,6 @@ export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
 }
 
-
 export function getUnitForSensorType(sensorType: SensorType): SensorUnit {
   switch (sensorType) {
     case 'voltage':
@@ -25,7 +24,7 @@ export function getUnitForSensorType(sensorType: SensorType): SensorUnit {
     case 'battery':
       return '%';
     default:
-      throw new Error("Unknown sensor type");
+      return ''; // Default to empty string for unknown types
   }
 }
 
@@ -46,7 +45,7 @@ export function getSensorTypeLabel(sensorType: SensorType): string {
     case 'battery':
       return 'Battery';
     default:
-      throw new Error("Unknown sensor type");
+      return 'Unknown sensor type';
   }
 }
 
@@ -66,6 +65,6 @@ export function getSensorTypeColor(sensorType: SensorType): string {
     case 'fuel':
       return '#005F6A'; // Petrol
     default:
-      throw new Error("Unknown sensor type");
+      return '#000000'; // Black for unknown types
   }
 }

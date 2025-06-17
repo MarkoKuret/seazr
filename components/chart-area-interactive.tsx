@@ -26,10 +26,22 @@ import {
 } from '@/components/ui/select';
 import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group';
 import { SensorReading, SensorType } from '@/types';
-import { getUnitForSensorType, getSensorTypeLabel, getSensorTypeColor } from '@/lib/utils';
+import {
+  getUnitForSensorType,
+  getSensorTypeLabel,
+  getSensorTypeColor,
+} from '@/lib/utils';
 
 // Available sensor types for the dropdown
-const SENSOR_TYPES: SensorType[] = ['voltage', 'temperature', 'humidity', 'pressure', 'water', 'fuel', 'battery'];
+const SENSOR_TYPES: SensorType[] = [
+  'voltage',
+  'temperature',
+  'humidity',
+  'pressure',
+  'water',
+  'fuel',
+  'battery',
+];
 
 interface ChartAreaInteractiveProps {
   sensorData: SensorReading[];
@@ -45,31 +57,34 @@ export function ChartAreaInteractive({
     React.useState<SensorType>('voltage');
 
   // Get the sensor unit for the selected type
-  const selectedSensorUnit = React.useMemo(() =>
-    getUnitForSensorType(selectedSensorType),
+  const selectedSensorUnit = React.useMemo(
+    () => getUnitForSensorType(selectedSensorType),
     [selectedSensorType]
   );
 
   // Get display name for selected sensor
-  const selectedSensorLabel = React.useMemo(() =>
-    getSensorTypeLabel(selectedSensorType),
+  const selectedSensorLabel = React.useMemo(
+    () => getSensorTypeLabel(selectedSensorType),
     [selectedSensorType]
   );
 
   // Get sensor color for visualization
-  const sensorColor = React.useMemo(() =>
-    getSensorTypeColor(selectedSensorType),
+  const sensorColor = React.useMemo(
+    () => getSensorTypeColor(selectedSensorType),
     [selectedSensorType]
   );
 
   // Create chart config for the selected sensor
-  const chartConfig = React.useMemo(() => ({
-    [selectedSensorType]: {
-      label: selectedSensorLabel,
-      color: sensorColor,
-      unit: selectedSensorUnit
-    }
-  }), [selectedSensorType, selectedSensorLabel, sensorColor, selectedSensorUnit]);
+  const chartConfig = React.useMemo(
+    () => ({
+      [selectedSensorType]: {
+        label: selectedSensorLabel,
+        color: sensorColor,
+        unit: selectedSensorUnit,
+      },
+    }),
+    [selectedSensorType, selectedSensorLabel, sensorColor, selectedSensorUnit]
+  );
 
   const filteredData = React.useMemo(() => {
     const cutoffDate = new Date();
@@ -127,7 +142,9 @@ export function ChartAreaInteractive({
             </div>
           </div>
           <CardDescription>
-            <span className='hidden @[540px]/card:block'> {/* ?! */}
+            <span className='hidden @[540px]/card:block'>
+              {' '}
+              {/* ?! */}
               {selectedSensorLabel} readings over time
               {selectedVessel !== 'all' && ` for vessel ${selectedVessel}`}
             </span>
@@ -176,16 +193,8 @@ export function ChartAreaInteractive({
           <AreaChart data={filteredData}>
             <defs>
               <linearGradient id='fillSensor' x1='0' y1='0' x2='0' y2='1'>
-                <stop
-                  offset='5%'
-                  stopColor={sensorColor}
-                  stopOpacity={0.8}
-                />
-                <stop
-                  offset='95%'
-                  stopColor={sensorColor}
-                  stopOpacity={0.1}
-                />
+                <stop offset='5%' stopColor={sensorColor} stopOpacity={0.8} />
+                <stop offset='95%' stopColor={sensorColor} stopOpacity={0.1} />
               </linearGradient>
             </defs>
             <CartesianGrid vertical={false} />
@@ -204,7 +213,7 @@ export function ChartAreaInteractive({
               }}
             />
             <ChartTooltip
-              cursor={true }
+              cursor={true}
               defaultIndex={isMobile ? -1 : 10}
               content={
                 <ChartTooltipContent
