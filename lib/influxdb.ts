@@ -30,13 +30,13 @@ function getInfluxClient(): InfluxDBClient {
  */
 function getMeasurementsForType(sensorType: SensorType): string[] {
   const sensorTypeMap: Record<SensorType, string[]> = {
-    voltage: ['voltage', 'battery'],
-    battery: ['voltage', 'battery'],
-    temperature: ['temperature'],
-    humidity: ['humidity'],
-    pressure: ['pressure'],
-    water: ['water'],
-    fuel: ['fuel'],
+    Voltage: ['Voltage', 'Battery'],
+    Battery: ['Voltage', 'Battery'],
+    Temperature: ['Temperature'],
+    Humidity: ['Humidity'],
+    Pressure: ['Pressure'],
+    Water: ['Water'],
+    Fuel: ['Fuel'],
   };
 
   return sensorTypeMap[sensorType] || [sensorType];
@@ -45,7 +45,7 @@ function getMeasurementsForType(sensorType: SensorType): string[] {
 /**
  * Execute a query with error handling
  */
-async function executeSesnorQuery(query: string): Promise<InfluxSensor[]> {
+async function executeSensorQuery(query: string): Promise<InfluxSensor[]> {
   try {
     const client = getInfluxClient();
     const rows: InfluxSensor[] = [];
@@ -108,7 +108,7 @@ export async function getAllSensorData(
       ORDER BY "sensorId", time DESC
     `;
 
-    const rows = await executeSesnorQuery(sqlQuery);
+    const rows = await executeSensorQuery(sqlQuery);
 
     return rows.map((row) => ({
       id: row.sensorId || row.vesselId + '-' + row.sensorType,
@@ -125,14 +125,14 @@ export async function getAllSensorData(
 }
 
 // /**
-//  * Get historical data for battery/voltage sensors
-//  * @deprecated Use getSensorHistoryData with type='voltage' instead
+//  * Get historical data for Battery/Voltage sensors
+//  * @deprecated Use getSensorHistoryData with type='Voltage' instead
 //  */
 // export async function getBatteryHistoryData(
 //   vesselShortIds: string[],
 //   days: number = 30
 // ): Promise<InfluxSensor[]> {
-//   return getSensorHistoryData(vesselShortIds, 'voltage', days);
+//   return getSensorHistoryData(vesselShortIds, 'Voltage', days);
 // }
 
 /**
@@ -140,7 +140,7 @@ export async function getAllSensorData(
  */
 export async function getSensorHistoryData(
   vesselShortIds: string[],
-  sensorType: SensorType = 'voltage',
+  sensorType: SensorType = 'Voltage',
   days: number = 30
 ): Promise<SensorReading[]> {
   if (vesselShortIds.length === 0) return [];
@@ -150,7 +150,9 @@ export async function getSensorHistoryData(
     const types = getMeasurementsForType(sensorType);
 
     // Format for SQL
-    const formattedTypes = types.map((type) => `'${type}'`).join(', ');
+    const formattedTypes = types
+      .map((type) => `'${type.toLowerCase()}'`)
+      .join(', ');
     const formattedVesselIds = vesselShortIds.map((id) => `'${id}'`).join(', ');
 
     const sqlQuery = `
@@ -162,7 +164,7 @@ export async function getSensorHistoryData(
       ORDER BY time ASC
     `;
 
-    const rows = await executeSesnorQuery(sqlQuery);
+    const rows = await executeSensorQuery(sqlQuery);
 
     return rows.map((point) => ({
       time: new Date(point._time).toISOString(),

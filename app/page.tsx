@@ -211,7 +211,7 @@ export default function LandingPage() {
                   icon: BarChart3,
                   title: 'Real-time Alerts',
                   description:
-                    'Receive instant notifications about critical issues like battery levels, bilge pump activity, or security breaches.',
+                    'Receive instant notifications about critical issues like Battery levels, bilge pump activity, or security breaches.',
                 },
               ].map((feature, index) => (
                 <div key={index} className='group relative'>

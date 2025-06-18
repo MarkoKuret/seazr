@@ -34,13 +34,13 @@ import {
 
 // Available sensor types for the dropdown
 const SENSOR_TYPES: SensorType[] = [
-  'voltage',
-  'temperature',
-  'humidity',
-  'pressure',
-  'water',
-  'fuel',
-  'battery',
+  'Voltage',
+  'Temperature',
+  'Humidity',
+  'Pressure',
+  'Water',
+  'Fuel',
+  'Battery',
 ];
 
 interface ChartAreaInteractiveProps {
@@ -54,7 +54,7 @@ export function ChartAreaInteractive({
   const [timeRange, setTimeRange] = React.useState('30d');
   const [selectedVessel] = React.useState<string>('all');
   const [selectedSensorType, setSelectedSensorType] =
-    React.useState<SensorType>('voltage');
+    React.useState<SensorType>('Voltage');
 
   // Get the sensor unit for the selected type
   const selectedSensorUnit = React.useMemo(
@@ -101,11 +101,11 @@ export function ChartAreaInteractive({
       // Filter by date
       const dateFilter = new Date(item.time) >= cutoffDate;
 
-      // Type filtering with special handling for battery/voltage
+      // Type filtering with special handling for Battery/Voltage
       const typeFilter =
         item.type === selectedSensorType ||
-        (selectedSensorType === 'voltage' && item.type === 'battery') ||
-        (item.type === 'voltage' && selectedSensorType === 'battery');
+        (selectedSensorType === 'Voltage' && item.type === 'Battery') ||
+        (item.type === 'Voltage' && selectedSensorType === 'Battery');
 
       return dateFilter && typeFilter;
     });
@@ -129,7 +129,7 @@ export function ChartAreaInteractive({
                 }
               >
                 <SelectTrigger className='w-24 md:w-32' size='sm'>
-                  <SelectValue placeholder={getSensorTypeLabel('voltage')} />
+                  <SelectValue placeholder={getSensorTypeLabel('Voltage')} />
                 </SelectTrigger>
                 <SelectContent>
                   {SENSOR_TYPES.map((type) => (

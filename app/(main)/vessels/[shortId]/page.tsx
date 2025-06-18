@@ -1,6 +1,6 @@
 import { Suspense } from 'react';
 import { SiteHeader } from '@/components/site-header';
-import { SectionCards } from '@/components/section-cards';
+import { SensorCards } from '@/components/sensor-cards';
 import { ChartAreaInteractive } from '@/components/chart-area-interactive';
 import { getAllSensorValues, getSensorHistory } from '@/server/sensor-action';
 import { SensorType } from '@/types';
@@ -16,10 +16,10 @@ async function VesselSensorCards({ vesselId }: { vesselId: string }) {
   try {
     const sensors = await getAllSensorValues(session.user.id, vesselId);
     return (
-      <SectionCards
+      <SensorCards
         sensors={sensors}
         isLoading={false}
-        minCards={4}
+        minCards={1}
         placeholderTitle='No Data'
         placeholderDescription='No sensor data for this vessel'
         placeholderMessage='Connect sensors to this vessel'
@@ -28,7 +28,7 @@ async function VesselSensorCards({ vesselId }: { vesselId: string }) {
   } catch (error) {
     console.error('Error fetching vessel sensor data:', error);
     return (
-      <SectionCards
+      <SensorCards
         sensors={[]}
         isLoading={false}
         minCards={4}
@@ -49,13 +49,13 @@ async function VesselSensorChart({ vesselShortId }: { vesselShortId: string }) {
   try {
     // Create an array to hold promises for all sensor types
     const sensorTypes: SensorType[] = [
-      'voltage',
-      'temperature',
-      'humidity',
-      'pressure',
-      'water',
-      'fuel',
-      'battery',
+      'Voltage',
+      'Temperature',
+      'Humidity',
+      'Pressure',
+      'Water',
+      'Fuel',
+      'Battery',
     ];
 
     const sensorDataPromises = sensorTypes.map((type) =>
@@ -81,19 +81,21 @@ async function VesselSensorChart({ vesselShortId }: { vesselShortId: string }) {
 
 export default async function VesselPage({
   params,
+  searchParams,
 }: {
   params: Promise<{ shortId: string }>;
+  searchParams: Promise<{ name: string }>;
 }) {
   const vesselShortId = (await params).shortId;
-  //const vesselShortId = shortId;
+  const vesselName = (await searchParams).name;
 
   return (
     <>
-      <SiteHeader title='Vessel' />
+      <SiteHeader title={vesselName} />
       <div className='flex flex-1 flex-col'>
         <div className='@container/main flex flex-1 flex-col gap-2'>
           <div className='flex flex-col gap-4 py-4 md:gap-6 md:py-6'>
-            <Suspense fallback={<SectionCards isLoading={true} sensors={[]} />}>
+            <Suspense fallback={<SensorCards isLoading={true} sensors={[]} />}>
               <VesselSensorCards vesselId={vesselShortId} />
             </Suspense>
             <div className='px-4 lg:px-6'>

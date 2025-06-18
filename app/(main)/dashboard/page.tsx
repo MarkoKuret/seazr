@@ -1,11 +1,13 @@
 import { Suspense } from 'react';
 import { SiteHeader } from '@/components/site-header';
-import { SectionCards } from '@/components/section-cards';
 import { DataTable } from '@/components/data-table';
-import { getAllSensorValues, getVesselLocation } from '@/server/sensor-action';
+import { getVesselLocation, getAllSensorValues } from '@/server/sensor-action';
 import { getSession } from '@/server/auth-action';
 import { redirect } from 'next/navigation';
 import VesselMapLoader from '@/components/vessel-map-loader';
+import { VesselStatusCards } from '@/components/vessel-status-card';
+import { getUserVessels } from '@/server/vessel-action';
+import { determineVesselStatus } from '@/lib/vessel-status';
 
 import data from './data.json';
 
@@ -17,42 +19,59 @@ async function VesselMapContainer() {
 
   try {
     const locations = await getVesselLocation(session.user.id);
-    // Use the new client component loader
     return <VesselMapLoader locations={locations} />;
   } catch (error) {
     console.error('Error fetching vessel location:', error);
-    // Use the new client component loader with empty data
     return <VesselMapLoader locations={[]} />;
   }
 }
 
-async function SensorCards() {
+async function VesselStatusContainer() {
   const session = await getSession();
   if (!session) {
     redirect('/login');
   }
 
   try {
-    const sensors = await getAllSensorValues(session.user.id);
+    const vessels = await getUserVessels(session.user.id);
+
+    const vesselStatusPromises = vessels.map(async (vessel) => {
+      const sensorReadings = await getAllSensorValues(
+        session.user.id,
+        vessel.shortId
+      );
+      const healthStatus = determineVesselStatus(sensorReadings);
+      return {
+        id: vessel.id,
+        shortId: vessel.shortId,
+        name: vessel.name,
+        status: healthStatus.status,
+        lastSeen: sensorReadings[0]?.time,
+        issues: healthStatus.issues,
+      };
+    });
+
+    const vesselStatuses = await Promise.all(vesselStatusPromises);
+
     return (
-      <SectionCards
-        sensors={sensors}
+      <VesselStatusCards
+        vessels={vesselStatuses}
         isLoading={false}
-        minCards={4}
-        placeholderTitle='No Data'
-        placeholderDescription='No sensor available'
-        placeholderMessage='Add sensors to your vessel'
+        minCards={1}
+        placeholderTitle='No Vessels'
+        placeholderDescription='No vessels available'
+        placeholderMessage='Add vessels to get started'
       />
     );
   } catch (error) {
-    console.error('Error fetching sensor data:', error);
+    console.error('Error fetching vessels:', error);
     return (
-      <SectionCards
-        sensors={[]}
+      <VesselStatusCards
+        vessels={[]}
         isLoading={false}
-        minCards={4}
+        minCards={1}
         placeholderTitle='Error'
-        placeholderDescription='Error loading sensors'
+        placeholderDescription='Error loading vessels'
         placeholderMessage='Please try again later'
       />
     );
@@ -66,8 +85,10 @@ export default async function DashboardPage() {
       <div className='flex flex-1 flex-col'>
         <div className='@container/main flex flex-1 flex-col gap-2'>
           <div className='flex flex-col gap-4 py-4 md:gap-6 md:py-6'>
-            <Suspense fallback={<SectionCards isLoading={true} sensors={[]} />}>
-              <SensorCards />
+            <Suspense
+              fallback={<VesselStatusCards isLoading={true} vessels={[]} />}
+            >
+              <VesselStatusContainer />
             </Suspense>
             <div className='px-4 lg:px-6'>
               <Suspense

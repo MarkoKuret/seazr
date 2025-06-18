@@ -4,29 +4,29 @@
 
 // All possible sensor types
 export type SensorType =
-  | 'voltage'
-  | 'temperature'
-  | 'humidity'
-  | 'pressure'
-  | 'water'
-  | 'fuel'
-  | 'battery'; //?! enum
+  | 'Voltage'
+  | 'Temperature'
+  | 'Humidity'
+  | 'Pressure'
+  | 'Water'
+  | 'Fuel'
+  | 'Battery';
 
 export type SensorUnit = 'V' | '°C' | 'L' | '%' | 'hPa' | '';
 
 export function getSensorUnit(type: SensorType): SensorUnit {
   switch (type) {
-    case 'voltage':
-    case 'battery':
+    case 'Voltage':
+    case 'Battery':
       return 'V';
-    case 'temperature':
+    case 'Temperature':
       return '°C';
-    case 'humidity':
+    case 'Humidity':
       return '%';
-    case 'pressure':
+    case 'Pressure':
       return 'hPa';
-    case 'water':
-    case 'fuel':
+    case 'Water':
+    case 'Fuel':
       return 'L';
     default:
       return 'V';

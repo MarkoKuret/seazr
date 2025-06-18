@@ -9,19 +9,19 @@ export function cn(...inputs: ClassValue[]) {
 
 export function getUnitForSensorType(sensorType: SensorType): SensorUnit {
   switch (sensorType) {
-    case 'voltage':
+    case 'Voltage':
       return 'V';
-    case 'temperature':
+    case 'Temperature':
       return '°C';
-    case 'humidity':
+    case 'Humidity':
       return '%';
-    case 'pressure':
+    case 'Pressure':
       return 'hPa';
-    case 'water':
+    case 'Water':
       return 'L';
-    case 'fuel':
+    case 'Fuel':
       return 'L';
-    case 'battery':
+    case 'Battery':
       return '%';
     default:
       return ''; // Default to empty string for unknown types
@@ -30,19 +30,19 @@ export function getUnitForSensorType(sensorType: SensorType): SensorUnit {
 
 export function getSensorTypeLabel(sensorType: SensorType): string {
   switch (sensorType) {
-    case 'voltage':
+    case 'Voltage':
       return 'Voltage';
-    case 'temperature':
+    case 'Temperature':
       return 'Temperature';
-    case 'humidity':
+    case 'Humidity':
       return 'Humidity';
-    case 'pressure':
+    case 'Pressure':
       return 'Pressure';
-    case 'water':
+    case 'Water':
       return 'Water Level';
-    case 'fuel':
+    case 'Fuel':
       return 'Fuel Level';
-    case 'battery':
+    case 'Battery':
       return 'Battery';
     default:
       return 'Unknown sensor type';
@@ -51,18 +51,18 @@ export function getSensorTypeLabel(sensorType: SensorType): string {
 
 export function getSensorTypeColor(sensorType: SensorType): string {
   switch (sensorType) {
-    case 'voltage':
-    case 'battery':
+    case 'Voltage':
+    case 'Battery':
       return '#4ade80'; // Green
-    case 'temperature':
+    case 'Temperature':
       return '#f97316'; // Orange
-    case 'humidity':
+    case 'Humidity':
       return '#3b82f6'; // Blue
-    case 'pressure':
+    case 'Pressure':
       return '#8b5cf6'; // Purple
-    case 'water':
+    case 'Water':
       return '#06b6d4'; // Cyan
-    case 'fuel':
+    case 'Fuel':
       return '#005F6A'; // Petrol
     default:
       return '#000000'; // Black for unknown types

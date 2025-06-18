@@ -66,7 +66,7 @@ export async function getAllSensorValues(
  */
 export async function getSensorHistory(
   userId: string,
-  sensorType: SensorType = 'voltage',
+  sensorType: SensorType = 'Voltage',
   days: number = 30,
   vesselId?: string
 ): Promise<SensorReading[]> {
@@ -145,20 +145,15 @@ export async function getVesselLocation(
       return [];
     }
 
-    const vesselInfo = permissions.map((p) => ({
-      shortId: p.vessel.shortId,
-      name: p.vessel.name,
-    }));
-
     const locations = await getVesselLocationData(
-      vesselInfo.map((v) => v.shortId)
+      permissions.map((v) => v.vessel.shortId)
     );
 
     return locations.map((loc) => {
-      const vessel = vesselInfo.find((v) => v.shortId === loc.vesselId);
+      const vessel = permissions.find((v) => v.vessel.shortId === loc.vesselId);
       return {
         ...loc,
-        vesselName: vessel?.name || 'Unknown Vessel',
+        vesselName: vessel?.vessel.name || 'Unknown Vessel',
       };
     });
   } catch (error: unknown) {

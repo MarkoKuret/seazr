@@ -38,14 +38,24 @@ function SensorCard({ sensor }: { sensor: SensorReading }) {
       </CardHeader>
       <CardFooter className='flex-col items-start gap-1.5 text-sm'>
         <div className='text-muted-foreground'>
-          Updated: {new Date(sensor.time).toLocaleTimeString('hr-HR')}
+          {(() => {
+            const date = new Date(sensor.time);
+            const isToday = date.getDate() === new Date().getDate();
+            const formattedTime = isToday
+              ? date.toLocaleTimeString([], {
+                  hour: '2-digit',
+                  minute: '2-digit',
+                })
+              : date.toLocaleDateString();
+            return `Updated: ${formattedTime}`;
+          })()}
         </div>
       </CardFooter>
     </Card>
   );
 }
 
-interface SectionCardsProps {
+interface SensorCardsProps {
   sensors: SensorReading[];
   isLoading?: boolean;
   minCards?: number;
@@ -54,14 +64,14 @@ interface SectionCardsProps {
   placeholderMessage?: string;
 }
 
-export function SectionCards({
+export function SensorCards({
   sensors = [],
   isLoading = false,
   minCards = 4,
   placeholderTitle = 'No Sensor',
   placeholderDescription = 'No data available',
   placeholderMessage = 'Add more sensors to your vessel',
-}: SectionCardsProps) {
+}: SensorCardsProps) {
   if (isLoading) {
     return (
       <div className='grid grid-cols-1 gap-4 px-4 lg:px-6 @xl/main:grid-cols-2 @5xl/main:grid-cols-4'>

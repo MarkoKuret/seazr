@@ -7,6 +7,7 @@ import type { VesselLocation } from '@/types';
 import L from 'leaflet';
 import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet';
 import MarkerClusterGroup from 'react-leaflet-markercluster';
+import Link from 'next/link';
 
 interface VesselMapProps {
   locations?: VesselLocation[];
@@ -45,7 +46,6 @@ export default function VesselMap({ locations = [] }: VesselMapProps) {
               attribution='&copy; Seazr'
               url='https://tiles.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}.png'
             />
-
             <MarkerClusterGroup
               chunkedLoading
               spiderfyOnMaxZoom={true}
@@ -58,20 +58,17 @@ export default function VesselMap({ locations = [] }: VesselMapProps) {
                 >
                   <Popup>
                     <div className='text-center'>
-                      <strong>
-                        {vessel.vesselName || `Vessel ${index + 1}`}
-                      </strong>
-                      <br />
-                      <span className='text-muted-foreground text-sm'>
-                        {vessel.latitude.toFixed(4)},{' '}
-                        {vessel.longitude.toFixed(4)}
-                      </span>
+                      <Link
+                        href={`/vessels/${vessel.vesselId}?name=${encodeURIComponent(vessel.vesselName ?? 'Vessel')}`}
+                        className='text-primary font-semibold hover:underline'
+                      >
+                        {vessel.vesselName}
+                      </Link>
                     </div>
                   </Popup>
                 </Marker>
               ))}
             </MarkerClusterGroup>
-
             {locations.length === 0 && (
               <div className='absolute top-1/2 left-1/2 z-[1000] -translate-x-1/2 -translate-y-1/2 transform rounded-lg bg-white p-3 text-center shadow-lg'>
                 No vessel locations available

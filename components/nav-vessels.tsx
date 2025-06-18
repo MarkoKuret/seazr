@@ -1,6 +1,8 @@
 'use client';
 
 import { IconSpeedboat } from '@tabler/icons-react';
+//import { Sailboat } from 'lucide-react';
+
 import {
   SidebarGroup,
   SidebarGroupContent,
@@ -35,7 +37,9 @@ export function NavVessels({
                     : ''
                 }
               >
-                <a href={`/vessels/${vessel.shortId}`}>
+                <a
+                  href={`/vessels/${vessel.shortId}?name=${encodeURIComponent(vessel.name)}`}
+                >
                   <IconSpeedboat />
                   <span>{vessel.name}</span>
                 </a>
