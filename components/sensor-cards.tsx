@@ -42,11 +42,11 @@ function SensorCard({ sensor }: { sensor: SensorReading }) {
             const date = new Date(sensor.time);
             const isToday = date.getDate() === new Date().getDate();
             const formattedTime = isToday
-              ? date.toLocaleTimeString([], {
+              ? date.toLocaleTimeString(["hr-HR"], {
                   hour: '2-digit',
                   minute: '2-digit',
                 })
-              : date.toLocaleDateString();
+              : date.toLocaleDateString("hr-HR");
             return `Updated: ${formattedTime}`;
           })()}
         </div>
@@ -91,7 +91,7 @@ export function SensorCards({
   }
 
   return (
-    <div className='*:data-[slot=card]:from-primary/5 *:data-[slot=card]:to-card dark:*:data-[slot=card]:bg-card grid grid-cols-1 gap-4 px-4 *:data-[slot=card]:bg-gradient-to-t *:data-[slot=card]:shadow-xs lg:px-6 @xl/main:grid-cols-2 @5xl/main:grid-cols-4'>
+    <div className='*:data-[slot=card]:from-primary/5 *:data-[slot=card]:to-card dark:*:data-[slot=card]:bg-card grid grid-cols-1 gap-4 px-4 *:data-[slot=card]:bg-gradient-to-t *:data-[slot=card]:shadow-xs lg:px-6 @xl/main:grid-cols-2 @5xl/main:grid-cols-4 @6xl/main:grid-cols-6'>
       {sensors.map((sensor) => (
         <SensorCard key={sensor.id} sensor={sensor} />
       ))}

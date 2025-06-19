@@ -42,12 +42,11 @@ async function VesselStatusContainer() {
       );
       const healthStatus = determineVesselStatus(sensorReadings);
       return {
-        id: vessel.id,
         shortId: vessel.shortId,
         name: vessel.name,
         status: healthStatus.status,
         lastSeen: sensorReadings[0]?.time,
-        issues: healthStatus.issues,
+        description: healthStatus.description,
       };
     });
 
