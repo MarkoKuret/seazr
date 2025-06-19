@@ -1,6 +1,6 @@
 import { Suspense } from 'react';
 import { SiteHeader } from '@/components/site-header';
-import { VesselsList } from '@/components/vessels/vessels-list';
+import { VesselsListContainer } from '@/components/vessels/vessels-list-container';
 import { AddVesselForm } from '@/components/vessels/add-vessel-form';
 import { Button } from '@/components/ui/button';
 import { PlusIcon } from 'lucide-react';
@@ -52,7 +52,7 @@ export default async function VesselsPage() {
             <Suspense
               fallback={<div className='px-4 lg:px-6'>Loading vessels...</div>}
             >
-              <VesselsList userId={session.user.id} />
+              <VesselsListContainer userId={session.user.id} />
             </Suspense>
           </div>
         </div>
