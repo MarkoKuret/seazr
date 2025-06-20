@@ -9,6 +9,12 @@ export const VesselStatusColor: Record<VesselStatusType, string> = {
   alarm: 'text-red-500',
 };
 
+// New interface for individual status descriptions
+export interface StatusDescription {
+  text: string;
+  status: VesselStatusType;
+}
+
 interface StatusThresholds {
   Battery: { warning: number; alarm: number };
   Temperature: {
@@ -36,7 +42,7 @@ const DATA_MAX_AGE = 12 * 60 * 60 * 1000; // 12 hours in milliseconds
 
 export interface VesselHealthStatus {
   status: VesselStatusType;
-  description: string[];
+  description: StatusDescription[]; // Now uses the new interface
 }
 
 /**
@@ -46,13 +52,13 @@ export function determineVesselStatus(
   sensorReadings: SensorReading[],
   thresholds: StatusThresholds = DEFAULT_THRESHOLDS
 ): VesselHealthStatus {
-  const description: string[] = [];
+  const description: StatusDescription[] = [];
   let status: VesselStatusType = 'nominal';
 
   if (sensorReadings.length === 0) {
     return {
       status: 'expired',
-      description: ['No sensor data available'],
+      description: [{ text: 'No sensor data available', status: 'expired' }],
     };
   }
 
@@ -61,8 +67,13 @@ export function determineVesselStatus(
   for (const reading of sensorReadings) {
     const dataAge = timeNow - new Date(reading.time).getTime();
     if (dataAge > DATA_MAX_AGE) {
-      status = 'expired';
-      description.push(`Expired ${reading.type.toLowerCase()} data`);
+      if (status == 'nominal') {
+        status = 'expired';
+      }
+      description.push({
+        text: `Expired ${reading.type.toLowerCase()} data`,
+        status: 'expired'
+      });
       continue;
     }
 
@@ -70,14 +81,16 @@ export function determineVesselStatus(
       case 'Battery':
         if (reading.value <= thresholds[reading.type].alarm) {
           status = 'alarm';
-          description.push(
-            `Low ${reading.type}: ${reading.value}${reading.unit}`
-          );
+          description.push({
+            text: `Low ${reading.type}: ${reading.value}${reading.unit}`,
+            status: 'alarm'
+          });
         } else if (reading.value <= thresholds[reading.type].warning) {
           if (status !== 'alarm') status = 'warning';
-          description.push(
-            `${reading.type} is low: ${reading.value}${reading.unit}`
-          );
+          description.push({
+            text: `${reading.type} is low: ${reading.value}${reading.unit}`,
+            status: 'warning'
+          });
         }
         break;
 
@@ -87,69 +100,87 @@ export function determineVesselStatus(
           reading.value >= thresholds.Temperature.alarmHigh
         ) {
           status = 'alarm';
-          description.push(
-            `Temperature critical: ${reading.value}${reading.unit}`
-          );
+          description.push({
+            text: `Temperature critical: ${reading.value}${reading.unit}`,
+            status: 'alarm'
+          });
         } else if (
           reading.value <= thresholds.Temperature.warningLow ||
           reading.value >= thresholds.Temperature.warningHigh
         ) {
           if (status !== 'alarm') status = 'warning';
-          description.push(
-            `Temperature abnormal: ${reading.value}${reading.unit}`
-          );
+          description.push({
+            text: `Temperature abnormal: ${reading.value}${reading.unit}`,
+            status: 'warning'
+          });
         }
         break;
 
       case 'Water':
         if (reading.value >= thresholds.Water.alarm) {
           status = 'alarm';
-          description.push(
-            `Water level critical: ${reading.value}${reading.unit}`
-          );
+          description.push({
+            text: `Water level critical: ${reading.value}${reading.unit}`,
+            status: 'alarm'
+          });
         } else if (reading.value >= thresholds.Water.warning) {
           if (status !== 'alarm') status = 'warning';
-          description.push(
-            `Water level elevated: ${reading.value}${reading.unit}`
-          );
+          description.push({
+            text: `Water level elevated: ${reading.value}${reading.unit}`,
+            status: 'warning'
+          });
         }
         break;
 
       case 'Fuel':
         if (reading.value <= thresholds.Fuel.alarm) {
           status = 'alarm';
-          description.push(
-            `Fuel critically low: ${reading.value}${reading.unit}`
-          );
+          description.push({
+            text: `Fuel critically low: ${reading.value}${reading.unit}`,
+            status: 'alarm'
+          });
         } else if (reading.value <= thresholds.Fuel.warning) {
           if (status !== 'alarm') status = 'warning';
-          description.push(`Fuel low: ${reading.value}${reading.unit}`);
+          description.push({
+            text: `Fuel low: ${reading.value}${reading.unit}`,
+            status: 'warning'
+          });
         }
         break;
 
       case 'Humidity':
         if (reading.value >= thresholds.Humidity.alarm) {
           status = 'alarm';
-          description.push(
-            `Humidity critical: ${reading.value}${reading.unit}`
-          );
+          description.push({
+            text: `Humidity critical: ${reading.value}${reading.unit}`,
+            status: 'alarm'
+          });
         } else if (reading.value >= thresholds.Humidity.warning) {
           if (status !== 'alarm') status = 'warning';
-          description.push(`High Humidity: ${reading.value}${reading.unit}`);
+          description.push({
+            text: `High Humidity: ${reading.value}${reading.unit}`,
+            status: 'warning'
+          });
         }
         break;
 
       case 'Bilge':
         if (reading.value > thresholds.Bilge.threshold) {
           status = 'alarm';
-          description.push('Water detected in bilge');
+          description.push({
+            text: 'Water detected in bilge',
+            status: 'alarm'
+          });
         }
         break;
     }
   }
 
   if (status === 'nominal') {
-    description.push('Nominal');
+    description.push({
+      text: 'Nominal',
+      status: 'nominal'
+    });
   }
 
   return {

@@ -6,6 +6,9 @@ import { getAllSensorValues, getSensorHistory } from '@/server/sensor-action';
 import { SensorType } from '@/types';
 import { getSession } from '@/server/auth-action';
 import { redirect } from 'next/navigation';
+import { VesselPageTabs } from '@/components/vessels/vessel-page-tabs';
+import { VesselStatusView } from '@/components/vessels/vessel-status-view';
+import { determineVesselStatus } from '@/lib/vessel-status';
 
 async function VesselSensorCards({ vesselId }: { vesselId: string }) {
   const session = await getSession();
@@ -79,15 +82,37 @@ async function VesselSensorChart({ vesselShortId }: { vesselShortId: string }) {
   }
 }
 
+async function VesselStatusContent({ vesselId }: { vesselId: string }) {
+  const session = await getSession();
+  if (!session) {
+    redirect('/login');
+  }
+
+  try {
+    const sensors = await getAllSensorValues(session.user.id, vesselId);
+    const status = determineVesselStatus(sensors);
+
+    return <VesselStatusView status={status} />;
+  } catch (error) {
+    console.error('Error fetching vessel status data:', error);
+    return (
+      <div className='p-6 text-center'>
+        <p>Failed to load vessel status data.</p>
+      </div>
+    );
+  }
+}
+
 export default async function VesselPage({
   params,
   searchParams,
 }: {
   params: Promise<{ shortId: string }>;
-  searchParams: Promise<{ name: string }>;
+  searchParams: Promise<{ name: string; tab?: string }>;
 }) {
   const vesselShortId = (await params).shortId;
   const vesselName = (await searchParams).name;
+  const tab = (await searchParams).tab || 'overview';
 
   return (
     <>
@@ -95,18 +120,34 @@ export default async function VesselPage({
       <div className='flex flex-1 flex-col'>
         <div className='@container/main flex flex-1 flex-col gap-2'>
           <div className='flex flex-col gap-4 py-4 md:gap-6 md:py-6'>
-            <Suspense fallback={<SensorCards isLoading={true} sensors={[]} />}>
-              <VesselSensorCards vesselId={vesselShortId} />
-            </Suspense>
-            <div className='px-4 lg:px-6'>
-              <Suspense
-                fallback={
-                  <div className='bg-muted h-[250px] animate-pulse rounded-lg'></div>
-                }
-              >
-                <VesselSensorChart vesselShortId={vesselShortId} />
-              </Suspense>
-            </div>
+            <VesselPageTabs/>
+
+            {tab === 'overview' ? (
+              <>
+                <Suspense fallback={<SensorCards isLoading={true} sensors={[]} />}>
+                  <VesselSensorCards vesselId={vesselShortId} />
+                </Suspense>
+                <div className='px-4 lg:px-6'>
+                  <Suspense
+                    fallback={
+                      <div className='bg-muted h-[250px] animate-pulse rounded-lg'></div>
+                    }
+                  >
+                    <VesselSensorChart vesselShortId={vesselShortId} />
+                  </Suspense>
+                </div>
+              </>
+            ) : (
+              <div className='px-4 lg:px-6'>
+                <Suspense
+                  fallback={
+                    <div className='bg-muted h-[400px] animate-pulse rounded-lg'></div>
+                  }
+                >
+                  <VesselStatusContent vesselId={vesselShortId} />
+                </Suspense>
+              </div>
+            )}
           </div>
         </div>
       </div>

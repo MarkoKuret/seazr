@@ -93,7 +93,7 @@ export function AddVesselForm({ userId }: { userId: string }) {
             <FormItem>
               <FormLabel>Vessel ID</FormLabel>
               <FormControl>
-                <Input placeholder='a1b2c' {...field} />
+                <Input placeholder='5-digit HEX' {...field} />
               </FormControl>
               <FormDescription>
                 Enter the 5-digit hex ID provided with your device

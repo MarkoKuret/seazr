@@ -1,6 +1,10 @@
 'use client';
 
-import { IconAlertCircle, IconCircleDashedCheck } from '@tabler/icons-react';
+import {
+  IconAlertCircle,
+  IconCircleDashedCheck,
+  IconClockHour4,
+} from '@tabler/icons-react';
 import {
   Card,
   CardDescription,
@@ -18,23 +22,26 @@ import {
   TooltipTrigger,
 } from '@/components/ui/tooltip';
 
+interface StatusDescription {
+  status: VesselStatusType;
+  text: string;
+}
+
 interface VesselStatus {
   shortId: string;
   name: string;
   status: VesselStatusType;
   lastSeen: string;
-  description: string[];
+  description: StatusDescription[]; // Update to use StatusDescription[]
 }
 
 function VesselStatusCard({ vessel }: { vessel: VesselStatus }) {
   const lastSeenDate = new Date(vessel.lastSeen);
   return (
-          <Link
-
-        href={`/vessels/${vessel.shortId}?name=${encodeURIComponent(vessel.name)}`}
-      >
-    <Card className='@container/card min-h-[180px] relative transition-all duration-200 hover:scale-[1.02] hover:shadow-lg from-primary/5 shadow-xs bg-gradient-to-t '>
-
+    <Link
+      href={`/vessels/${vessel.shortId}?name=${encodeURIComponent(vessel.name)}`}
+    >
+      <Card className='@container/card min-h-[180px] relative transition-all duration-200 hover:scale-[1.02] hover:shadow-lg from-primary/5 shadow-xs bg-gradient-to-t'>
         <CardHeader className='flex flex-row items-start justify-between'>
           <div>
             <CardDescription></CardDescription>
@@ -61,12 +68,20 @@ function VesselStatusCard({ vessel }: { vessel: VesselStatus }) {
           <TooltipTrigger>
             <CardContent>
               <div className={`${VesselStatusColor[vessel.status]} text-left`}>
-                {vessel.description[0]}
+                {vessel.description[0].text}
                 {vessel.description.length > 1 &&
                   `  (+${vessel.description.length - 1} more)`}
                 <TooltipContent side='bottom' className='text-md text-black'>
                   {vessel.description.map((issue, index) => (
-                    <p key={`${vessel.shortId}-issue-${index}`}>{issue}</p>
+                    <div
+                      key={`${vessel.shortId}-issue-${index}`}
+                      className='flex items-center gap-2'
+                    >
+                      <StatusIcon status={issue.status} />
+                      <span className={VesselStatusColor[issue.status]}>
+                        {issue.text}
+                      </span>
+                    </div>
                   ))}
                 </TooltipContent>
               </div>
@@ -91,10 +106,26 @@ function VesselStatusCard({ vessel }: { vessel: VesselStatus }) {
             </CardFooter>
           </TooltipTrigger>
         </Tooltip>
-    </Card>
-      </Link>
-
+      </Card>
+    </Link>
   );
+}
+
+function StatusIcon({ status }: { status: VesselStatusType }) {
+  const className = VesselStatusColor[status];
+
+  switch (status) {
+    case 'nominal':
+      return <IconCircleDashedCheck className={className} size={16} />;
+    case 'warning':
+      return <IconAlertCircle className={className} size={16} />;
+    case 'alarm':
+      return <IconAlertCircle className={className} size={16} />;
+    case 'expired':
+      return <IconClockHour4 className={className} size={16} />;
+    default:
+      return null;
+  }
 }
 
 interface VesselStatusCardsProps {

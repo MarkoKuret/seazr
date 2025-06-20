@@ -34,6 +34,7 @@ import {
 import { EditVesselForm } from './edit-vessel-form';
 import { deleteVessel } from '@/server/vessel-action';
 import { toast } from 'sonner';
+import Link from 'next/link';
 
 interface VesselsListProps {
   vessels: Vessel[];
@@ -95,6 +96,7 @@ export function VesselsList({ vessels, userId }: VesselsListProps) {
     <>
       <div className='grid gap-4 px-4 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-4 lg:px-6'>
         {vessels.map((vessel) => (
+          <Link key={vessel.id} href={`/vessels/${vessel.shortId}`}>
           <Card key={vessel.id}>
             <CardHeader>
               <CardTitle className='text-lg'>{vessel.name}</CardTitle>
@@ -133,6 +135,7 @@ export function VesselsList({ vessels, userId }: VesselsListProps) {
               </Button>
             </CardFooter>
           </Card>
+          </Link>
         ))}
       </div>
 
