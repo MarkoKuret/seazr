@@ -4,17 +4,10 @@ import * as React from 'react';
 import Image from 'next/image';
 import { usePathname } from 'next/navigation';
 
-import {
-  IconChartBar,
-  IconDashboard,
-  IconHelp,
-  IconReport,
-  IconSearch,
-  IconSettings,
-  IconAnchor,
-} from '@tabler/icons-react';
+import { IconHelp, IconAnchor } from '@tabler/icons-react';
+import { ShipWheel, ClipboardPlus } from 'lucide-react';
 
-import { NavDocuments } from '@/components/nav-documents';
+import { NavManagement } from '@/components/nav-management';
 import { NavMain } from '@/components/nav-main';
 import { NavSecondary } from '@/components/nav-secondary';
 import { NavUser } from '@/components/nav-user';
@@ -40,41 +33,26 @@ const data = {
     {
       title: 'Dashboard',
       url: '/dashboard',
-      icon: IconDashboard,
-    },
-    {
-      title: 'Analytics',
-      url: '#',
-      icon: IconChartBar,
+      icon: IconAnchor,
     },
   ],
   navSecondary: [
     {
-      title: 'Settings',
-      url: '#',
-      icon: IconSettings,
-    },
-    {
       title: 'Get Help',
-      url: '#',
+      url: '/help',
       icon: IconHelp,
-    },
-    {
-      title: 'Search',
-      url: '#',
-      icon: IconSearch,
     },
   ],
   management: [
     {
       name: 'Manage Vessels',
       url: '/manage',
-      icon: IconAnchor,
+      icon: ShipWheel,
     },
     {
       name: 'Reports',
-      url: '#',
-      icon: IconReport,
+      url: '/reports',
+      icon: ClipboardPlus,
     },
   ],
 };
@@ -119,7 +97,7 @@ export function AppSidebar({
       <SidebarContent>
         <NavMain items={data.navMain} currentPath={pathname} />
         <NavVessels vessels={vessels} currentPath={pathname} />
-        <NavDocuments items={data.management} currentPath={pathname} />
+        <NavManagement items={data.management} currentPath={pathname} />
         <NavSecondary items={data.navSecondary} className='mt-auto' />
       </SidebarContent>
       <SidebarFooter>

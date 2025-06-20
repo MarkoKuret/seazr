@@ -97,44 +97,44 @@ export function VesselsList({ vessels, userId }: VesselsListProps) {
       <div className='grid gap-4 px-4 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-4 lg:px-6'>
         {vessels.map((vessel) => (
           <Link key={vessel.id} href={`/vessels/${vessel.shortId}`}>
-          <Card key={vessel.id}>
-            <CardHeader>
-              <CardTitle className='text-lg'>{vessel.name}</CardTitle>
-              <CardDescription>ID: {vessel.shortId}</CardDescription>
-            </CardHeader>
-            <CardContent>
-              {vessel.description ? (
-                <p>{vessel.description}</p>
-              ) : (
-                <p className='text-muted-foreground italic'>No description</p>
-              )}
-            </CardContent>
-            <CardFooter className='flex justify-end gap-2'>
-              <Sheet>
-                <SheetTrigger asChild>
-                  <Button variant='outline' size='sm'>
-                    <PenIcon className='h-4 w-4 mr-1' /> Edit
-                  </Button>
-                </SheetTrigger>
-                <SheetContent>
-                  <SheetHeader>
-                    <SheetTitle>Edit Vessel</SheetTitle>
-                    <SheetDescription>
-                      Update your vessel information below.
-                    </SheetDescription>
-                  </SheetHeader>
-                  <EditVesselForm userId={userId} vessel={vessel} />
-                </SheetContent>
-              </Sheet>
-              <Button
-                variant='destructive'
-                size='sm'
-                onClick={() => handleDeleteClick(vessel)}
-              >
-                <Trash2Icon className='h-4 w-4'/>
-              </Button>
-            </CardFooter>
-          </Card>
+            <Card key={vessel.id}>
+              <CardHeader>
+                <CardTitle className='text-lg'>{vessel.name}</CardTitle>
+                <CardDescription>ID: {vessel.shortId}</CardDescription>
+              </CardHeader>
+              <CardContent>
+                {vessel.description ? (
+                  <p>{vessel.description}</p>
+                ) : (
+                  <p className='text-muted-foreground italic'>No description</p>
+                )}
+              </CardContent>
+              <CardFooter className='flex justify-end gap-2'>
+                <Sheet>
+                  <SheetTrigger asChild>
+                    <Button variant='outline' size='sm'>
+                      <PenIcon className='mr-1 h-4 w-4' /> Edit
+                    </Button>
+                  </SheetTrigger>
+                  <SheetContent>
+                    <SheetHeader>
+                      <SheetTitle>Edit Vessel</SheetTitle>
+                      <SheetDescription>
+                        Update your vessel information below.
+                      </SheetDescription>
+                    </SheetHeader>
+                    <EditVesselForm userId={userId} vessel={vessel} />
+                  </SheetContent>
+                </Sheet>
+                <Button
+                  variant='destructive'
+                  size='sm'
+                  onClick={() => handleDeleteClick(vessel)}
+                >
+                  <Trash2Icon className='h-4 w-4' />
+                </Button>
+              </CardFooter>
+            </Card>
           </Link>
         ))}
       </div>

@@ -126,9 +126,7 @@ export async function getSensorHistoryData(
   sensorType: SensorType = 'Battery',
   days: number = 30
 ): Promise<SensorReading[]> {
-
   try {
-
     const formatedType = `'${sensorType.toLowerCase()}'`;
     const formattedVesselIds = `'${vesselShortId}'`;
 

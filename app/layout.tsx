@@ -1,7 +1,8 @@
 import type { Metadata } from 'next';
 import { Geist, Geist_Mono } from 'next/font/google';
 import './globals.css';
-import './globals.css';import { Toaster } from 'sonner';
+import './globals.css';
+import { Toaster } from 'sonner';
 
 const geistSans = Geist({
   variable: '--font-geist-sans',
@@ -14,7 +15,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: 'Seazr | Maritime IoT',
+  title: 'Seazr',
   description:
     "Transform your boat's existing sensors into smart IoT devices with Seazr. Monitor your vessel from anywhere in the world.",
   keywords: [
@@ -35,7 +36,7 @@ export default function RootLayout({
     <html lang='en'>
       <body className={`${geistSans.variable} ${geistMono.variable}`}>
         {children}
-        <Toaster position='top-center'/>
+        <Toaster position='top-center' />
       </body>
     </html>
   );

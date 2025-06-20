@@ -1,6 +1,7 @@
 'use client';
 
-import { type Icon } from '@tabler/icons-react';
+import React from 'react';
+import { type Icon } from 'lucide-react';
 
 import {
   SidebarGroup,
@@ -10,18 +11,18 @@ import {
   SidebarMenuItem,
 } from '@/components/ui/sidebar';
 
-export function NavDocuments({
+export function NavManagement({
   items,
   currentPath,
 }: {
   items: {
     name: string;
     url: string;
-    icon: Icon;
+    icon: typeof Icon;
   }[];
   currentPath: string;
 }) {
-  //const { isMobile } = useSidebar();
+  //const { isMobile } = useSidebar(); ?!
 
   return (
     <SidebarGroup className='group-data-[collapsible=icon]:hidden'>
@@ -38,7 +39,7 @@ export function NavDocuments({
               }
             >
               <a href={item.url}>
-                <item.icon />
+                {React.createElement(item.icon)}
                 <span>{item.name}</span>
               </a>
             </SidebarMenuButton>

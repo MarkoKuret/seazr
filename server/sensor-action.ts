@@ -71,13 +71,12 @@ export async function getSensorHistory(
   vesselId: string
 ): Promise<SensorReading[]> {
   try {
-      const hasPermission = await checkUserVesselPermission(userId, vesselId);
-      if (!hasPermission) {
-        throw new Error('You do not have permission to access this vessel');
-      }
+    const hasPermission = await checkUserVesselPermission(userId, vesselId);
+    if (!hasPermission) {
+      throw new Error('You do not have permission to access this vessel');
+    }
 
-      return await getSensorHistoryData(vesselId, sensorType, days);
-
+    return await getSensorHistoryData(vesselId, sensorType, days);
   } catch (error: unknown) {
     console.error('Error fetching sensor history:', error);
     const message =

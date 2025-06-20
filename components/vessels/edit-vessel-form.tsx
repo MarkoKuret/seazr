@@ -23,9 +23,12 @@ import { Vessel } from '@/types';
 
 const vesselEditSchema = z.object({
   name: z.string().min(1, { message: 'Vessel name is required' }),
-  description: z.string().max(100, {
-    message: 'Description cannot exceed 100 characters',
-  }).optional(),
+  description: z
+    .string()
+    .max(100, {
+      message: 'Description cannot exceed 100 characters',
+    })
+    .optional(),
 });
 
 interface EditVesselFormProps {
@@ -34,7 +37,11 @@ interface EditVesselFormProps {
   onClose?: () => void;
 }
 
-export function EditVesselForm({ userId, vessel, onClose }: EditVesselFormProps) {
+export function EditVesselForm({
+  userId,
+  vessel,
+  onClose,
+}: EditVesselFormProps) {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const router = useRouter();
   const form = useForm<z.infer<typeof vesselEditSchema>>({

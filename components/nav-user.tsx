@@ -4,7 +4,6 @@ import { signOut } from '@/server/auth-action';
 import Link from 'next/link';
 
 import {
-  IconCreditCard,
   IconDotsVertical,
   IconLogout,
   IconNotification,
@@ -66,10 +65,6 @@ export function NavUser({
                   <IconUserCircle className='mr-2 h-4 w-4' />
                   Account
                 </Link>
-              </DropdownMenuItem>
-              <DropdownMenuItem>
-                <IconCreditCard />
-                Billing
               </DropdownMenuItem>
               <DropdownMenuItem>
                 <IconNotification />

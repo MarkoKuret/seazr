@@ -42,11 +42,11 @@ function SensorCard({ sensor }: { sensor: SensorReading }) {
             const date = new Date(sensor.time);
             const isToday = date.getDate() === new Date().getDate();
             const formattedTime = isToday
-              ? date.toLocaleTimeString(["hr-HR"], {
+              ? date.toLocaleTimeString(['hr-HR'], {
                   hour: '2-digit',
                   minute: '2-digit',
                 })
-              : date.toLocaleDateString("hr-HR");
+              : date.toLocaleDateString('hr-HR');
             return `Updated: ${formattedTime}`;
           })()}
         </div>

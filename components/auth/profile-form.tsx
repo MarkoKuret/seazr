@@ -31,15 +31,22 @@ const profileSchema = z.object({
   email: z.string().email({ message: 'Invalid email address' }),
 });
 
-const passwordSchema = z.object({
-  currentPassword: z.string().min(1, { message: 'Current password is required' }),
-  newPassword: z.string()
-    .min(6, { message: 'New password must be at least 6 characters' }),
-  confirmPassword: z.string().min(1, { message: 'Please confirm your new password' }),
-}).refine((data) => data.newPassword === data.confirmPassword, {
-  message: 'Passwords do not match',
-  path: ['confirmPassword'],
-});
+const passwordSchema = z
+  .object({
+    currentPassword: z
+      .string()
+      .min(1, { message: 'Current password is required' }),
+    newPassword: z
+      .string()
+      .min(6, { message: 'New password must be at least 6 characters' }),
+    confirmPassword: z
+      .string()
+      .min(1, { message: 'Please confirm your new password' }),
+  })
+  .refine((data) => data.newPassword === data.confirmPassword, {
+    message: 'Passwords do not match',
+    path: ['confirmPassword'],
+  });
 
 interface ProfileFormProps {
   user: {
@@ -118,7 +125,7 @@ export function ProfileForm({ user }: ProfileFormProps) {
   }
 
   return (
-    <div className="flex flex-col gap-8 max-w-2xl">
+    <div className='flex max-w-2xl flex-col gap-8'>
       <Card>
         <CardHeader>
           <CardTitle>Personal Information</CardTitle>
@@ -126,15 +133,18 @@ export function ProfileForm({ user }: ProfileFormProps) {
         </CardHeader>
         <CardContent>
           <Form {...profileForm}>
-            <form onSubmit={profileForm.handleSubmit(onProfileSubmit)} className="space-y-6">
+            <form
+              onSubmit={profileForm.handleSubmit(onProfileSubmit)}
+              className='space-y-6'
+            >
               <FormField
                 control={profileForm.control}
-                name="name"
+                name='name'
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>Name</FormLabel>
                     <FormControl>
-                      <Input placeholder="Your name" {...field} />
+                      <Input placeholder='Your name' {...field} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -143,19 +153,19 @@ export function ProfileForm({ user }: ProfileFormProps) {
 
               <FormField
                 control={profileForm.control}
-                name="email"
+                name='email'
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>Email address</FormLabel>
                     <FormControl>
-                      <Input placeholder="your.email@example.com" {...field} />
+                      <Input placeholder='your.email@example.com' {...field} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
                 )}
               />
 
-              <Button type="submit" disabled={isProfileSubmitting}>
+              <Button type='submit' disabled={isProfileSubmitting}>
                 {isProfileSubmitting ? 'Saving...' : 'Save changes'}
               </Button>
             </form>
@@ -166,19 +176,24 @@ export function ProfileForm({ user }: ProfileFormProps) {
       <Card>
         <CardHeader>
           <CardTitle>Change Password</CardTitle>
-          <CardDescription>Update your password to keep your account secure</CardDescription>
+          <CardDescription>
+            Update your password to keep your account secure
+          </CardDescription>
         </CardHeader>
         <CardContent>
           <Form {...passwordForm}>
-            <form onSubmit={passwordForm.handleSubmit(onPasswordSubmit)} className="space-y-6">
+            <form
+              onSubmit={passwordForm.handleSubmit(onPasswordSubmit)}
+              className='space-y-6'
+            >
               <FormField
                 control={passwordForm.control}
-                name="currentPassword"
+                name='currentPassword'
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>Current Password</FormLabel>
                     <FormControl>
-                      <Input type="password" {...field} />
+                      <Input type='password' {...field} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -187,12 +202,12 @@ export function ProfileForm({ user }: ProfileFormProps) {
 
               <FormField
                 control={passwordForm.control}
-                name="newPassword"
+                name='newPassword'
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>New Password</FormLabel>
                     <FormControl>
-                      <Input type="password" {...field} />
+                      <Input type='password' {...field} />
                     </FormControl>
                     <FormDescription>
                       Password must be at least 6 characters long
@@ -204,20 +219,22 @@ export function ProfileForm({ user }: ProfileFormProps) {
 
               <FormField
                 control={passwordForm.control}
-                name="confirmPassword"
+                name='confirmPassword'
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>Confirm New Password</FormLabel>
                     <FormControl>
-                      <Input type="password" {...field} />
+                      <Input type='password' {...field} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
                 )}
               />
 
-              <Button type="submit" disabled={isPasswordSubmitting}>
-                {isPasswordSubmitting ? 'Changing password...' : 'Change password'}
+              <Button type='submit' disabled={isPasswordSubmitting}>
+                {isPasswordSubmitting
+                  ? 'Changing password...'
+                  : 'Change password'}
               </Button>
             </form>
           </Form>

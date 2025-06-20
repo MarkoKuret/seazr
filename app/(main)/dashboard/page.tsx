@@ -1,6 +1,5 @@
 import { Suspense } from 'react';
 import { SiteHeader } from '@/components/site-header';
-import { DataTable } from '@/components/data-table';
 import { getVesselLocation, getAllSensorValues } from '@/server/sensor-action';
 import { getSession } from '@/server/auth-action';
 import { redirect } from 'next/navigation';
@@ -8,8 +7,6 @@ import VesselMapLoader from '@/components/vessel-map-loader';
 import { VesselStatusCards } from '@/components/vessel-status-card';
 import { getUserVessels } from '@/server/vessel-action';
 import { determineVesselStatus } from '@/lib/vessel-status';
-
-import data from './data.json';
 
 async function VesselMapContainer() {
   const session = await getSession();
@@ -98,7 +95,6 @@ export default async function DashboardPage() {
                 <VesselMapContainer />
               </Suspense>
             </div>
-            <DataTable data={data} />
           </div>
         </div>
       </div>

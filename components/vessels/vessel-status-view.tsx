@@ -1,7 +1,15 @@
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { VesselStatusType, VesselStatusColor, StatusDescription } from '@/lib/vessel-status';
+import {
+  VesselStatusType,
+  VesselStatusColor,
+  StatusDescription,
+} from '@/lib/vessel-status';
 import { Badge } from '@/components/ui/badge';
-import { IconAlertCircle, IconCircleCheckFilled, IconClockHour4 } from '@tabler/icons-react';
+import {
+  IconAlertCircle,
+  IconCircleCheckFilled,
+  IconClockHour4,
+} from '@tabler/icons-react';
 
 interface VesselStatusViewProps {
   status: {
@@ -12,20 +20,22 @@ interface VesselStatusViewProps {
 
 export function VesselStatusView({ status }: VesselStatusViewProps) {
   return (
-    <div className="space-y-6">
+    <div className='space-y-6'>
       <Card>
         <CardHeader>
-          <div className="flex items-center justify-between">
+          <div className='flex items-center justify-between'>
             <CardTitle>Vessel Status</CardTitle>
             <StatusBadge status={status.status} />
           </div>
         </CardHeader>
         <CardContent>
-          <ul className="space-y-4">
+          <ul className='space-y-4'>
             {status.description.map((desc, index) => (
-              <li key={`status-${index}`} className="flex items-center gap-3">
+              <li key={`status-${index}`} className='flex items-center gap-3'>
                 <StatusIcon status={desc.status} />
-                <span className={VesselStatusColor[desc.status]}>{desc.text}</span>
+                <span className={VesselStatusColor[desc.status]}>
+                  {desc.text}
+                </span>
               </li>
             ))}
           </ul>
@@ -38,13 +48,29 @@ export function VesselStatusView({ status }: VesselStatusViewProps) {
 function StatusBadge({ status }: { status: VesselStatusType }) {
   switch (status) {
     case 'nominal':
-      return <Badge className="bg-green-100 text-green-800 hover:bg-green-200">Nominal</Badge>;
+      return (
+        <Badge className='bg-green-100 text-green-800 hover:bg-green-200'>
+          Nominal
+        </Badge>
+      );
     case 'warning':
-      return <Badge className="bg-amber-100 text-amber-800 hover:bg-amber-200">Warning</Badge>;
+      return (
+        <Badge className='bg-amber-100 text-amber-800 hover:bg-amber-200'>
+          Warning
+        </Badge>
+      );
     case 'alarm':
-      return <Badge className="bg-red-100 text-red-800 hover:bg-red-200">Alarm</Badge>;
+      return (
+        <Badge className='bg-red-100 text-red-800 hover:bg-red-200'>
+          Alarm
+        </Badge>
+      );
     case 'expired':
-      return <Badge className="bg-gray-100 text-gray-800 hover:bg-gray-200">Expired</Badge>;
+      return (
+        <Badge className='bg-gray-100 text-gray-800 hover:bg-gray-200'>
+          Expired
+        </Badge>
+      );
     default:
       return null;
   }

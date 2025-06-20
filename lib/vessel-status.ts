@@ -72,7 +72,7 @@ export function determineVesselStatus(
       }
       description.push({
         text: `Expired ${reading.type.toLowerCase()} data`,
-        status: 'expired'
+        status: 'expired',
       });
       continue;
     }
@@ -83,13 +83,13 @@ export function determineVesselStatus(
           status = 'alarm';
           description.push({
             text: `Low ${reading.type}: ${reading.value}${reading.unit}`,
-            status: 'alarm'
+            status: 'alarm',
           });
         } else if (reading.value <= thresholds[reading.type].warning) {
           if (status !== 'alarm') status = 'warning';
           description.push({
             text: `${reading.type} is low: ${reading.value}${reading.unit}`,
-            status: 'warning'
+            status: 'warning',
           });
         }
         break;
@@ -102,7 +102,7 @@ export function determineVesselStatus(
           status = 'alarm';
           description.push({
             text: `Temperature critical: ${reading.value}${reading.unit}`,
-            status: 'alarm'
+            status: 'alarm',
           });
         } else if (
           reading.value <= thresholds.Temperature.warningLow ||
@@ -111,7 +111,7 @@ export function determineVesselStatus(
           if (status !== 'alarm') status = 'warning';
           description.push({
             text: `Temperature abnormal: ${reading.value}${reading.unit}`,
-            status: 'warning'
+            status: 'warning',
           });
         }
         break;
@@ -121,13 +121,13 @@ export function determineVesselStatus(
           status = 'alarm';
           description.push({
             text: `Water level critical: ${reading.value}${reading.unit}`,
-            status: 'alarm'
+            status: 'alarm',
           });
         } else if (reading.value >= thresholds.Water.warning) {
           if (status !== 'alarm') status = 'warning';
           description.push({
             text: `Water level elevated: ${reading.value}${reading.unit}`,
-            status: 'warning'
+            status: 'warning',
           });
         }
         break;
@@ -137,13 +137,13 @@ export function determineVesselStatus(
           status = 'alarm';
           description.push({
             text: `Fuel critically low: ${reading.value}${reading.unit}`,
-            status: 'alarm'
+            status: 'alarm',
           });
         } else if (reading.value <= thresholds.Fuel.warning) {
           if (status !== 'alarm') status = 'warning';
           description.push({
             text: `Fuel low: ${reading.value}${reading.unit}`,
-            status: 'warning'
+            status: 'warning',
           });
         }
         break;
@@ -153,13 +153,13 @@ export function determineVesselStatus(
           status = 'alarm';
           description.push({
             text: `Humidity critical: ${reading.value}${reading.unit}`,
-            status: 'alarm'
+            status: 'alarm',
           });
         } else if (reading.value >= thresholds.Humidity.warning) {
           if (status !== 'alarm') status = 'warning';
           description.push({
             text: `High Humidity: ${reading.value}${reading.unit}`,
-            status: 'warning'
+            status: 'warning',
           });
         }
         break;
@@ -169,7 +169,7 @@ export function determineVesselStatus(
           status = 'alarm';
           description.push({
             text: 'Water detected in bilge',
-            status: 'alarm'
+            status: 'alarm',
           });
         }
         break;
@@ -179,7 +179,7 @@ export function determineVesselStatus(
   if (status === 'nominal') {
     description.push({
       text: 'Nominal',
-      status: 'nominal'
+      status: 'nominal',
     });
   }
 

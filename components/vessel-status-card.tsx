@@ -41,7 +41,7 @@ function VesselStatusCard({ vessel }: { vessel: VesselStatus }) {
     <Link
       href={`/vessels/${vessel.shortId}?name=${encodeURIComponent(vessel.name)}`}
     >
-      <Card className='@container/card min-h-[180px] relative transition-all duration-200 hover:scale-[1.02] hover:shadow-lg from-primary/5 shadow-xs bg-gradient-to-t'>
+      <Card className='from-primary/5 @container/card relative min-h-[180px] bg-gradient-to-t shadow-xs transition-all duration-200 hover:scale-[1.02] hover:shadow-lg'>
         <CardHeader className='flex flex-row items-start justify-between'>
           <div>
             <CardDescription></CardDescription>

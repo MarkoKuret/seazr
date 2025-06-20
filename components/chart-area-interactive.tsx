@@ -26,10 +26,7 @@ import {
 } from '@/components/ui/select';
 import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group';
 import { SensorReading, SensorType } from '@/types';
-import {
-  getUnitForSensorType,
-  getSensorTypeColor,
-} from '@/lib/utils';
+import { getUnitForSensorType, getSensorTypeColor } from '@/lib/utils';
 
 // Available sensor types for the dropdown
 const SENSOR_TYPES: SensorType[] = [
@@ -95,8 +92,7 @@ export function ChartAreaInteractive({
       const dateFilter = new Date(item.time) >= cutoffDate;
 
       // Type filtering with special handling for Battery/Voltage
-      const typeFilter =
-        item.type === selectedSensorType
+      const typeFilter = item.type === selectedSensorType;
       return dateFilter && typeFilter;
     });
   }, [sensorData, timeRange, selectedSensorType]);

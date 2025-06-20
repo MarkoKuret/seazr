@@ -67,7 +67,7 @@ export async function changeUserPassword({
       await auth.api.signInEmail({
         body: {
           email: user.email,
-          password: currentPassword
+          password: currentPassword,
         },
       });
     } catch (error) {
@@ -76,7 +76,7 @@ export async function changeUserPassword({
 
     const ctx = await auth.$context;
     const hash = await ctx.password.hash(newPassword);
-    await ctx.internalAdapter.updatePassword(userId, hash)
+    await ctx.internalAdapter.updatePassword(userId, hash);
 
     return { success: true };
   } catch (error) {

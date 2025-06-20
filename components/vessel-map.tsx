@@ -35,7 +35,10 @@ export default function VesselMap({ locations = [] }: VesselMapProps) {
   return (
     <Card className='overflow-hidden p-0'>
       <CardContent className='p-0'>
-        <div className='h-[550px] w-full rounded-md'>
+        <div
+          className='w-full rounded-md'
+          style={{ minHeight: 400, height: '60vh', maxHeight: 600 }}
+        >
           <MapContainer
             center={mapCenter as [number, number]}
             zoom={10}

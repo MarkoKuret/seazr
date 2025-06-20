@@ -127,9 +127,9 @@ export function AddVesselForm({ userId }: { userId: string }) {
             </Button>
           </SheetClose>
           <SheetClose asChild>
-          <Button type='submit' disabled={isSubmitting}>
-            {isSubmitting ? 'Adding...' : 'Add Vessel'}
-          </Button>
+            <Button type='submit' disabled={isSubmitting}>
+              {isSubmitting ? 'Adding...' : 'Add Vessel'}
+            </Button>
           </SheetClose>
         </div>
       </form>

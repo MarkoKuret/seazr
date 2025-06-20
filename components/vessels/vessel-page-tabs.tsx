@@ -17,11 +17,15 @@ export function VesselPageTabs() {
   };
 
   return (
-    <div className="px-4 lg:px-6">
-      <Tabs value={currentTab} onValueChange={handleTabChange} className="w-full">
-        <TabsList className="grid w-full max-w-xs grid-cols-2">
-          <TabsTrigger value="overview">Overview</TabsTrigger>
-          <TabsTrigger value="status">Status</TabsTrigger>
+    <div className='px-4 lg:px-6'>
+      <Tabs
+        value={currentTab}
+        onValueChange={handleTabChange}
+        className='w-full'
+      >
+        <TabsList className='grid w-full max-w-xs grid-cols-2'>
+          <TabsTrigger value='overview'>Overview</TabsTrigger>
+          <TabsTrigger value='status'>Status</TabsTrigger>
         </TabsList>
       </Tabs>
     </div>

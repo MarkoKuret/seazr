@@ -17,5 +17,6 @@ export const config = {
     '/vessels/:path*',
     '/settings/:path*',
     '/reports/:path*',
+    '/help',
   ],
 };
