@@ -4,34 +4,16 @@
 
 // All possible sensor types
 export type SensorType =
-  | 'Voltage'
+  | 'Battery'
   | 'Temperature'
   | 'Humidity'
   | 'Pressure'
+  | 'Wind'
   | 'Water'
   | 'Fuel'
-  | 'Battery';
+  | 'Bilge';  // Added new sensor type
 
-export type SensorUnit = 'V' | '°C' | 'L' | '%' | 'hPa' | '';
-
-export function getSensorUnit(type: SensorType): SensorUnit {
-  switch (type) {
-    case 'Voltage':
-    case 'Battery':
-      return 'V';
-    case 'Temperature':
-      return '°C';
-    case 'Humidity':
-      return '%';
-    case 'Pressure':
-      return 'hPa';
-    case 'Water':
-    case 'Fuel':
-      return 'L';
-    default:
-      return 'V';
-  }
-}
+export type SensorUnit = 'V' | '°C' | 'L' | '%' | 'hPa' | 'kn' | '';
 
 export interface SensorReading {
   id?: string;

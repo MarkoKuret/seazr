@@ -28,19 +28,19 @@ import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group';
 import { SensorReading, SensorType } from '@/types';
 import {
   getUnitForSensorType,
-  getSensorTypeLabel,
   getSensorTypeColor,
 } from '@/lib/utils';
 
 // Available sensor types for the dropdown
 const SENSOR_TYPES: SensorType[] = [
-  'Voltage',
+  'Battery',
   'Temperature',
   'Humidity',
   'Pressure',
+  'Wind',
   'Water',
   'Fuel',
-  'Battery',
+  'Bilge',
 ];
 
 interface ChartAreaInteractiveProps {
@@ -54,17 +54,11 @@ export function ChartAreaInteractive({
   const [timeRange, setTimeRange] = React.useState('30d');
   const [selectedVessel] = React.useState<string>('all');
   const [selectedSensorType, setSelectedSensorType] =
-    React.useState<SensorType>('Voltage');
+    React.useState<SensorType>('Battery');
 
   // Get the sensor unit for the selected type
   const selectedSensorUnit = React.useMemo(
     () => getUnitForSensorType(selectedSensorType),
-    [selectedSensorType]
-  );
-
-  // Get display name for selected sensor
-  const selectedSensorLabel = React.useMemo(
-    () => getSensorTypeLabel(selectedSensorType),
     [selectedSensorType]
   );
 
@@ -78,12 +72,11 @@ export function ChartAreaInteractive({
   const chartConfig = React.useMemo(
     () => ({
       [selectedSensorType]: {
-        label: selectedSensorLabel,
         color: sensorColor,
         unit: selectedSensorUnit,
       },
     }),
-    [selectedSensorType, selectedSensorLabel, sensorColor, selectedSensorUnit]
+    [selectedSensorType, sensorColor, selectedSensorUnit]
   );
 
   const filteredData = React.useMemo(() => {
@@ -103,10 +96,7 @@ export function ChartAreaInteractive({
 
       // Type filtering with special handling for Battery/Voltage
       const typeFilter =
-        item.type === selectedSensorType ||
-        (selectedSensorType === 'Voltage' && item.type === 'Battery') ||
-        (item.type === 'Voltage' && selectedSensorType === 'Battery');
-
+        item.type === selectedSensorType
       return dateFilter && typeFilter;
     });
   }, [sensorData, timeRange, selectedSensorType]);
@@ -118,7 +108,7 @@ export function ChartAreaInteractive({
           <div className='flex items-center justify-between'>
             <CardTitle className='flex-grow'>
               <div className='flex items-center gap-2'>
-                <span>{selectedSensorLabel}</span>
+                <span>{selectedSensorType}</span>
               </div>
             </CardTitle>
             <div className='mr-2 flex gap-2'>
@@ -129,12 +119,12 @@ export function ChartAreaInteractive({
                 }
               >
                 <SelectTrigger className='w-24 md:w-32' size='sm'>
-                  <SelectValue placeholder={getSensorTypeLabel('Voltage')} />
+                  <SelectValue placeholder={'Battery'} />
                 </SelectTrigger>
                 <SelectContent>
                   {SENSOR_TYPES.map((type) => (
                     <SelectItem key={type} value={type}>
-                      {getSensorTypeLabel(type)}
+                      {type}
                     </SelectItem>
                   ))}
                 </SelectContent>
@@ -145,7 +135,7 @@ export function ChartAreaInteractive({
             <span className='hidden @[540px]/card:block'>
               {' '}
               {/* ?! */}
-              {selectedSensorLabel} readings over time
+              {selectedSensorType} readings over time
               {selectedVessel !== 'all' && ` for vessel ${selectedVessel}`}
             </span>
             <span className='@[540px]/card:hidden'>Sensor history</span>
@@ -240,7 +230,7 @@ export function ChartAreaInteractive({
               type='monotone'
               fill='url(#fillSensor)'
               stroke={sensorColor}
-              name={selectedSensorLabel}
+              name={selectedSensorType}
             />
           </AreaChart>
         </ChartContainer>

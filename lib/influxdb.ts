@@ -26,23 +26,6 @@ function getInfluxClient(): InfluxDBClient {
 }
 
 /**
- * Map sensor types to their measurements in the database
- */
-function getMeasurementsForType(sensorType: SensorType): string[] {
-  const sensorTypeMap: Record<SensorType, string[]> = {
-    Voltage: ['Voltage', 'Battery'],
-    Battery: ['Voltage', 'Battery'],
-    Temperature: ['Temperature'],
-    Humidity: ['Humidity'],
-    Pressure: ['Pressure'],
-    Water: ['Water'],
-    Fuel: ['Fuel'],
-  };
-
-  return sensorTypeMap[sensorType] || [sensorType];
-}
-
-/**
  * Execute a query with error handling
  */
 async function executeSensorQuery(query: string): Promise<InfluxSensor[]> {
@@ -139,27 +122,21 @@ export async function getAllSensorData(
  * Get historical data for any sensor type
  */
 export async function getSensorHistoryData(
-  vesselShortIds: string[],
-  sensorType: SensorType = 'Voltage',
+  vesselShortId: string,
+  sensorType: SensorType = 'Battery',
   days: number = 30
 ): Promise<SensorReading[]> {
-  if (vesselShortIds.length === 0) return [];
 
   try {
-    // Get the appropriate sensor types to query
-    const types = getMeasurementsForType(sensorType);
 
-    // Format for SQL
-    const formattedTypes = types
-      .map((type) => `'${type.toLowerCase()}'`)
-      .join(', ');
-    const formattedVesselIds = vesselShortIds.map((id) => `'${id}'`).join(', ');
+    const formatedType = `'${sensorType.toLowerCase()}'`;
+    const formattedVesselIds = `'${vesselShortId}'`;
 
     const sqlQuery = `
       SELECT time, value, "vesselId", "sensorType"
       FROM sensor
       WHERE time >= now() - interval '${days} days'
-      AND "sensorType" IN (${formattedTypes})
+      AND "sensorType" IN (${formatedType})
       AND "vesselId" IN (${formattedVesselIds})
       ORDER BY time ASC
     `;

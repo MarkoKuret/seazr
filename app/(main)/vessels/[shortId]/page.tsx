@@ -47,15 +47,15 @@ async function VesselSensorChart({ vesselShortId }: { vesselShortId: string }) {
   }
 
   try {
-    // Create an array to hold promises for all sensor types
     const sensorTypes: SensorType[] = [
-      'Voltage',
+      'Battery',
       'Temperature',
       'Humidity',
       'Pressure',
+      'Wind',
       'Water',
       'Fuel',
-      'Battery',
+      'Bilge',
     ];
 
     const sensorDataPromises = sensorTypes.map((type) =>

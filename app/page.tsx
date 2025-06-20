@@ -127,7 +127,7 @@ export default function LandingPage() {
                             </Badge>
                           </div>
                           <div className='grid grid-cols-2 gap-4'>
-                            <div className='bg-wave-crest rounded-md p-3 shadow-sm'>
+                            <div className='rounded-md p-3 shadow-sm'>
                               <div className='text-muted-foreground text-xs'>
                                 Battery
                               </div>
@@ -135,7 +135,7 @@ export default function LandingPage() {
                                 95%
                               </div>
                             </div>
-                            <div className='bg-wave-crest rounded-md p-3 shadow-sm'>
+                            <div className='rounded-md p-3 shadow-sm'>
                               <div className='text-muted-foreground text-xs'>
                                 Bilge
                               </div>
@@ -143,7 +143,7 @@ export default function LandingPage() {
                                 Normal
                               </div>
                             </div>
-                            <div className='bg-wave-crest rounded-md p-3 shadow-sm'>
+                            <div className='rounded-md p-3 shadow-sm'>
                               <div className='text-muted-foreground text-xs'>
                                 Temperature
                               </div>
@@ -151,7 +151,7 @@ export default function LandingPage() {
                                 72°F
                               </div>
                             </div>
-                            <div className='bg-wave-crest rounded-md p-3 shadow-sm'>
+                            <div className='rounded-md p-3 shadow-sm'>
                               <div className='text-muted-foreground text-xs'>
                                 Humidity
                               </div>

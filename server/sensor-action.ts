@@ -66,27 +66,18 @@ export async function getAllSensorValues(
  */
 export async function getSensorHistory(
   userId: string,
-  sensorType: SensorType = 'Voltage',
+  sensorType: SensorType = 'Battery',
   days: number = 30,
-  vesselId?: string
+  vesselId: string
 ): Promise<SensorReading[]> {
   try {
-    if (vesselId) {
       const hasPermission = await checkUserVesselPermission(userId, vesselId);
       if (!hasPermission) {
         throw new Error('You do not have permission to access this vessel');
       }
 
-      return await getSensorHistoryData([vesselId], sensorType, days);
-    }
+      return await getSensorHistoryData(vesselId, sensorType, days);
 
-    const vesselShortIds = await getUserVesselShortIds(userId);
-
-    if (vesselShortIds.length === 0) {
-      return [];
-    }
-
-    return await getSensorHistoryData(vesselShortIds, sensorType, days);
   } catch (error: unknown) {
     console.error('Error fetching sensor history:', error);
     const message =

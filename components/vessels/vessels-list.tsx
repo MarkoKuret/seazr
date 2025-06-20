@@ -93,7 +93,7 @@ export function VesselsList({ vessels, userId }: VesselsListProps) {
 
   return (
     <>
-      <div className='grid gap-4 px-4 md:grid-cols-2 lg:grid-cols-3 lg:px-6'>
+      <div className='grid gap-4 px-4 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-4 lg:px-6'>
         {vessels.map((vessel) => (
           <Card key={vessel.id}>
             <CardHeader>

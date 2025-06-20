@@ -25,7 +25,6 @@ import {
 } from '@/components/ui/form';
 import { updateUserProfile, changeUserPassword } from '@/server/user-action';
 import { toast } from 'sonner';
-import { Separator } from '@/components/ui/separator';
 
 const profileSchema = z.object({
   name: z.string().min(1, { message: 'Name is required' }),

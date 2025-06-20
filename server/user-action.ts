@@ -15,7 +15,6 @@ export async function updateUserProfile({
   email: string;
 }) {
   try {
-    // Check if email is already in use by another user
     const existingUser = await prisma.user.findFirst({
       where: {
         email,
@@ -29,7 +28,6 @@ export async function updateUserProfile({
       return { error: 'Email is already in use' };
     }
 
-    // Update user profile
     const user = await prisma.user.update({
       where: { id: userId },
       data: {
@@ -56,7 +54,6 @@ export async function changeUserPassword({
   newPassword: string;
 }) {
   try {
-    // First verify the current password is correct
     const user = await prisma.user.findUnique({
       where: { id: userId },
       select: { email: true },
@@ -66,9 +63,7 @@ export async function changeUserPassword({
       return { error: 'User not found' };
     }
 
-    // Verify current password using the auth API
     try {
-      // Check the current password by attempting to sign in
       await auth.api.signInEmail({
         body: {
           email: user.email,

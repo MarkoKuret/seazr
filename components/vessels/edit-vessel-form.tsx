@@ -23,7 +23,9 @@ import { Vessel } from '@/types';
 
 const vesselEditSchema = z.object({
   name: z.string().min(1, { message: 'Vessel name is required' }),
-  description: z.string().optional(),
+  description: z.string().max(100, {
+    message: 'Description cannot exceed 100 characters',
+  }).optional(),
 });
 
 interface EditVesselFormProps {
@@ -50,7 +52,7 @@ export function EditVesselForm({ userId, vessel, onClose }: EditVesselFormProps)
         userId,
         vesselId: vessel.id,
         name: values.name,
-        description: values.description || undefined,
+        description: values.description,
       });
 
       if (result.error) {

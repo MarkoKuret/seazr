@@ -9,7 +9,7 @@ export function cn(...inputs: ClassValue[]) {
 
 export function getUnitForSensorType(sensorType: SensorType): SensorUnit {
   switch (sensorType) {
-    case 'Voltage':
+    case 'Battery':
       return 'V';
     case 'Temperature':
       return '°C';
@@ -17,41 +17,19 @@ export function getUnitForSensorType(sensorType: SensorType): SensorUnit {
       return '%';
     case 'Pressure':
       return 'hPa';
+    case 'Wind':
+      return 'kn';
     case 'Water':
       return 'L';
     case 'Fuel':
       return 'L';
-    case 'Battery':
-      return '%';
     default:
       return ''; // Default to empty string for unknown types
   }
 }
 
-export function getSensorTypeLabel(sensorType: SensorType): string {
-  switch (sensorType) {
-    case 'Voltage':
-      return 'Voltage';
-    case 'Temperature':
-      return 'Temperature';
-    case 'Humidity':
-      return 'Humidity';
-    case 'Pressure':
-      return 'Pressure';
-    case 'Water':
-      return 'Water Level';
-    case 'Fuel':
-      return 'Fuel Level';
-    case 'Battery':
-      return 'Battery';
-    default:
-      return 'Unknown sensor type';
-  }
-}
-
 export function getSensorTypeColor(sensorType: SensorType): string {
   switch (sensorType) {
-    case 'Voltage':
     case 'Battery':
       return '#4ade80'; // Green
     case 'Temperature':
@@ -64,6 +42,8 @@ export function getSensorTypeColor(sensorType: SensorType): string {
       return '#06b6d4'; // Cyan
     case 'Fuel':
       return '#005F6A'; // Petrol
+    case 'Bilge':
+      return '#ef4444'; // Red (indicating potential problem)
     default:
       return '#000000'; // Black for unknown types
   }

@@ -10,7 +10,7 @@ export const VesselStatusColor: Record<VesselStatusType, string> = {
 };
 
 interface StatusThresholds {
-  Voltage: { warning: number; alarm: number };
+  Battery: { warning: number; alarm: number };
   Temperature: {
     warningLow: number;
     warningHigh: number;
@@ -20,16 +20,16 @@ interface StatusThresholds {
   Humidity: { warning: number; alarm: number };
   Water: { warning: number; alarm: number };
   Fuel: { warning: number; alarm: number };
-  Battery: { warning: number; alarm: number };
+  Bilge: { threshold: number }; // Threshold for bilge (1 = water detected)
 }
 
 const DEFAULT_THRESHOLDS: StatusThresholds = {
-  Voltage: { warning: 11.8, alarm: 11.2 },
+  Battery: { warning: 11.8, alarm: 11.2 },
   Temperature: { warningLow: 5, warningHigh: 40, alarmLow: 0, alarmHigh: 50 },
   Humidity: { warning: 85, alarm: 95 },
   Water: { warning: 10, alarm: 30 },
   Fuel: { warning: 20, alarm: 10 },
-  Battery: { warning: 30, alarm: 20 },
+  Bilge: { threshold: 0.5 }, // Above this value means water is detected
 };
 
 const DATA_MAX_AGE = 12 * 60 * 60 * 1000; // 12 hours in milliseconds
@@ -67,7 +67,6 @@ export function determineVesselStatus(
     }
 
     switch (reading.type) {
-      case 'Voltage':
       case 'Battery':
         if (reading.value <= thresholds[reading.type].alarm) {
           status = 'alarm';
@@ -137,6 +136,13 @@ export function determineVesselStatus(
         } else if (reading.value >= thresholds.Humidity.warning) {
           if (status !== 'alarm') status = 'warning';
           description.push(`High Humidity: ${reading.value}${reading.unit}`);
+        }
+        break;
+
+      case 'Bilge':
+        if (reading.value > thresholds.Bilge.threshold) {
+          status = 'alarm';
+          description.push('Water detected in bilge');
         }
         break;
     }

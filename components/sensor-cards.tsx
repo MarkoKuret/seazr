@@ -21,7 +21,7 @@ function SensorCard({ sensor }: { sensor: SensorReading }) {
       onMouseLeave={() => setIsHovered(false)}
     >
       <CardHeader>
-        <CardDescription>
+        <CardDescription className='text-deep-sea'>
           {sensor.type.toUpperCase()}
           <span
             className={`ml-1 transition-opacity duration-200 ${
