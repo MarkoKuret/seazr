@@ -1,11 +1,6 @@
 'use client';
 
 import {
-  IconAlertCircle,
-  IconCircleDashedCheck,
-  IconClockHour4,
-} from '@tabler/icons-react';
-import {
   Card,
   CardDescription,
   CardContent,
@@ -13,7 +8,8 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/card';
-import { VesselStatusType, VesselStatusColor } from '@/lib/vessel-status';
+import { VesselStatusType } from '@/types';
+import { StatusIcon, getStatusColor } from '@/lib/utils';
 import Link from 'next/link';
 
 import {
@@ -50,24 +46,14 @@ function VesselStatusCard({ vessel }: { vessel: VesselStatus }) {
             </CardTitle>
           </div>
           <div className='flex items-center'>
-            {vessel.status === 'nominal' ? (
-              <IconCircleDashedCheck
-                className={VesselStatusColor[vessel.status]}
-                size={30}
-              />
-            ) : (
-              <IconAlertCircle
-                className={VesselStatusColor[vessel.status]}
-                size={30}
-              />
-            )}
+            <StatusIcon status={vessel.status} size={30} />
           </div>
         </CardHeader>
 
         <Tooltip>
           <TooltipTrigger>
             <CardContent>
-              <div className={`${VesselStatusColor[vessel.status]} text-left`}>
+              <div className={`${getStatusColor(vessel.status)} text-left`}>
                 {vessel.description[0].text}
                 {vessel.description.length > 1 &&
                   `  (+${vessel.description.length - 1} more)`}
@@ -78,7 +64,7 @@ function VesselStatusCard({ vessel }: { vessel: VesselStatus }) {
                       className='flex items-center gap-2'
                     >
                       <StatusIcon status={issue.status} />
-                      <span className={VesselStatusColor[issue.status]}>
+                      <span className={getStatusColor(issue.status)}>
                         {issue.text}
                       </span>
                     </div>
@@ -109,23 +95,6 @@ function VesselStatusCard({ vessel }: { vessel: VesselStatus }) {
       </Card>
     </Link>
   );
-}
-
-function StatusIcon({ status }: { status: VesselStatusType }) {
-  const className = VesselStatusColor[status];
-
-  switch (status) {
-    case 'nominal':
-      return <IconCircleDashedCheck className={className} size={16} />;
-    case 'warning':
-      return <IconAlertCircle className={className} size={16} />;
-    case 'alarm':
-      return <IconAlertCircle className={className} size={16} />;
-    case 'expired':
-      return <IconClockHour4 className={className} size={16} />;
-    default:
-      return null;
-  }
 }
 
 interface VesselStatusCardsProps {

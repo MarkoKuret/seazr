@@ -1,15 +1,8 @@
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import {
-  VesselStatusType,
-  VesselStatusColor,
-  StatusDescription,
-} from '@/lib/vessel-status';
+import { StatusDescription } from '@/lib/vessel-status';
+import { VesselStatusType } from '@/types';
+import { StatusIcon, getStatusColor } from '@/lib/utils';
 import { Badge } from '@/components/ui/badge';
-import {
-  IconAlertCircle,
-  IconCircleCheckFilled,
-  IconClockHour4,
-} from '@tabler/icons-react';
 
 interface VesselStatusViewProps {
   status: {
@@ -32,10 +25,8 @@ export function VesselStatusView({ status }: VesselStatusViewProps) {
           <ul className='space-y-4'>
             {status.description.map((desc, index) => (
               <li key={`status-${index}`} className='flex items-center gap-3'>
-                <StatusIcon status={desc.status} />
-                <span className={VesselStatusColor[desc.status]}>
-                  {desc.text}
-                </span>
+                <StatusIcon status={desc.status} size={20} variant='filled' />
+                <span className={getStatusColor(desc.status)}>{desc.text}</span>
               </li>
             ))}
           </ul>
@@ -71,23 +62,6 @@ function StatusBadge({ status }: { status: VesselStatusType }) {
           Expired
         </Badge>
       );
-    default:
-      return null;
-  }
-}
-
-function StatusIcon({ status }: { status: VesselStatusType }) {
-  const className = VesselStatusColor[status];
-
-  switch (status) {
-    case 'nominal':
-      return <IconCircleCheckFilled className={className} size={20} />;
-    case 'warning':
-      return <IconAlertCircle className={className} size={20} />;
-    case 'alarm':
-      return <IconAlertCircle className={className} size={20} />;
-    case 'expired':
-      return <IconClockHour4 className={className} size={20} />;
     default:
       return null;
   }

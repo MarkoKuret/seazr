@@ -1,13 +1,4 @@
-import { SensorReading } from '@/types';
-
-export type VesselStatusType = 'nominal' | 'expired' | 'warning' | 'alarm';
-
-export const VesselStatusColor: Record<VesselStatusType, string> = {
-  nominal: 'text-green-600',
-  expired: 'text-gray-400',
-  warning: 'text-amber-500',
-  alarm: 'text-red-500',
-};
+import { SensorReading, VesselStatusType } from '@/types';
 
 // New interface for individual status descriptions
 export interface StatusDescription {

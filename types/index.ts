@@ -73,3 +73,5 @@ export interface VesselLocation {
   longitude: number;
   timestamp: string;
 }
+
+export type VesselStatusType = 'nominal' | 'expired' | 'warning' | 'alarm';
