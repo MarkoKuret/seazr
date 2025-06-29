@@ -5,8 +5,16 @@ import { BarChart3, Compass, Gauge, Globe, Waves, Router } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
+import { getSession } from '@/server/auth-action';
+import { redirect } from 'next/navigation';
 
-export default function LandingPage() {
+export default async function LandingPage() {
+  const session = await getSession();
+
+  if (session) {
+    redirect('/dashboard');
+  }
+
   return (
     <div className='flex min-h-screen flex-col'>
       {/* Header */}
@@ -74,13 +82,13 @@ export default function LandingPage() {
                   </div>
 
                   <h1 className='text-4xl font-bold tracking-tight sm:text-5xl xl:text-6xl/none'>
-                    Make Your Boat <span className='logo-gradient'>Smart</span>{' '}
-                    with Existing Sensors
+                    Make Your Boat{' '}
+                    <span className='logo-gradient'>Smart</span>{' '}
                   </h1>
                   <p className='text-muted-foreground max-w-[600px] text-lg md:text-xl'>
-                    Seazr transforms your existing boat sensors into smart IoT
-                    devices, giving you real-time monitoring and peace of mind
-                    from anywhere in the world.
+                    Get real time status using existing sensors into smart IoT
+                    devices, giving you a peace of mind from anywhere in the
+                    world.
                   </p>
                 </div>
                 <div className='flex flex-col gap-4 min-[400px]:flex-row'>

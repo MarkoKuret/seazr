@@ -176,7 +176,7 @@
 }
 
 .logo-gradient {
-  background: linear-gradient(90deg, var(--ocean-blue), var(--deep-sea));
+  background: linear-gradient(90deg, var(--primary), var(--ocean-blue));
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
