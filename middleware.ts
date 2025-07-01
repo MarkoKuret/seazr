@@ -18,5 +18,6 @@ export const config = {
     '/settings/:path*',
     '/reports/:path*',
     '/help',
+    '/notifications',
   ],
 };
