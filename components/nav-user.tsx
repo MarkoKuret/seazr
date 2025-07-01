@@ -66,9 +66,11 @@ export function NavUser({
                   Account
                 </Link>
               </DropdownMenuItem>
-              <DropdownMenuItem>
-                <IconNotification />
-                Notifications
+              <DropdownMenuItem asChild>
+                <Link href='/notifications'>
+                  <IconNotification className='mr-2 h-4 w-4' />
+                  Notifications
+                </Link>
               </DropdownMenuItem>
             </DropdownMenuGroup>
             <DropdownMenuSeparator />

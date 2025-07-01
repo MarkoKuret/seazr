@@ -34,6 +34,9 @@ export default function RootLayout({
 }>) {
   return (
     <html lang='en'>
+      {/* <head>
+        <link rel="manifest" href="public/manifest.js" />
+      </head> */}
       <meta name='apple-mobile-web-app-title' content='Seazr' />
       <body className={`${geistSans.variable} ${geistMono.variable}`}>
         {children}

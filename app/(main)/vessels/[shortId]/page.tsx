@@ -9,12 +9,18 @@ import { redirect } from 'next/navigation';
 import { VesselPageTabs } from '@/components/vessels/vessel-page-tabs';
 import { VesselStatusView } from '@/components/vessels/vessel-status-view';
 import { determineVesselStatus } from '@/lib/vessel-status';
+import { sendNotification } from '@/server/notification-action';
 
 async function VesselSensorCards({ vesselId }: { vesselId: string }) {
   const session = await getSession();
   if (!session) {
     redirect('/login');
   }
+
+  sendNotification(
+    'Seazr Notification',
+    `Sensor data for vessel ${vesselId} has been successfully loaded.`
+  );
 
   try {
     const sensors = await getAllSensorValues(session.user.id, vesselId);

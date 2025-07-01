@@ -47,6 +47,8 @@
     "@radix-ui/react-tooltip": "^1.2.6",
     "@tabler/icons-react": "^3.33.0",
     "@tanstack/react-table": "^8.21.3",
+    "@types/next-pwa": "^5.6.9",
+    "@types/web-push": "^3.6.4",
     "better-auth": "^1.2.8",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
@@ -59,6 +61,7 @@
     "leaflet.markercluster": "^1.5.3",
     "lucide-react": "^0.511.0",
     "next": "15.3.2",
+    "next-pwa": "^5.6.0",
     "next-themes": "^0.4.6",
     "prettier-plugin-tailwindcss": "^0.6.11",
     "prisma": "^6.8.2",
@@ -74,6 +77,7 @@
     "sonner": "^2.0.3",
     "tailwind-merge": "^3.3.0",
     "vaul": "^1.1.2",
+    "web-push": "^3.6.7",
     "zod": "^3.24.4"
   },
   "devDependencies": {
