@@ -14,11 +14,11 @@ export const auth = betterAuth({
   }),
   emailAndPassword: {
     enabled: true,
-    sendResetPassword: async ({user, url}) => {
+    sendResetPassword: async ({ user, url }) => {
       const emailContent = getPasswordResetEmailTemplate(user.name, url);
       await sendEmail({
         to: user.email,
-        ...emailContent
+        ...emailContent,
       });
     },
   },
@@ -82,7 +82,7 @@ export async function requestPasswordResetApi(email: string) {
       body: {
         email,
         redirectTo: '/reset-password',
-      }
+      },
     });
     return { success: true };
   } catch (error) {
@@ -100,7 +100,7 @@ export async function resetPasswordApi(newPassword: string, token: string) {
       body: {
         newPassword,
         token,
-      }
+      },
     });
     return { success: true };
   } catch (error) {

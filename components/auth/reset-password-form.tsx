@@ -95,34 +95,33 @@ export function ResetPasswordForm({
     <div className={cn('flex flex-col gap-6', className)} {...props}>
       <Card>
         <CardHeader>
-          <CardTitle className="text-2xl">Reset Password</CardTitle>
-          <CardDescription>
-            Please enter your new password
-          </CardDescription>
+          <CardTitle className='text-2xl'>Reset Password</CardTitle>
+          <CardDescription>Please enter your new password</CardDescription>
         </CardHeader>
         <CardContent>
           {isSuccess ? (
-            <div className="bg-green-50 text-green-800 rounded-md p-4">
-              <p>
-                Password has been reset! Redirecting to login...
-              </p>
+            <div className='rounded-md bg-green-50 p-4 text-green-800'>
+              <p>Password has been reset! Redirecting to login...</p>
             </div>
           ) : (
             <Form {...form}>
-              <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+              <form
+                onSubmit={form.handleSubmit(onSubmit)}
+                className='space-y-6'
+              >
                 {error && (
-                  <div className="bg-destructive/15 text-destructive rounded-md p-3 text-sm">
+                  <div className='bg-destructive/15 text-destructive rounded-md p-3 text-sm'>
                     {error}
                   </div>
                 )}
                 <FormField
                   control={form.control}
-                  name="password"
+                  name='password'
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel>New Password</FormLabel>
                       <FormControl>
-                        <Input type="password" {...field} />
+                        <Input type='password' {...field} />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -130,26 +129,26 @@ export function ResetPasswordForm({
                 />
                 <FormField
                   control={form.control}
-                  name="confirmPassword"
+                  name='confirmPassword'
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel>Confirm Password</FormLabel>
                       <FormControl>
-                        <Input type="password" {...field} />
+                        <Input type='password' {...field} />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
                   )}
                 />
                 <Button
-                  type="submit"
-                  className="w-full"
+                  type='submit'
+                  className='w-full'
                   disabled={isSubmitting || !token}
                 >
                   {isSubmitting ? 'Resetting...' : 'Reset Password'}
                 </Button>
-                <div className="text-center text-sm">
-                  <a href="/login" className="underline underline-offset-4">
+                <div className='text-center text-sm'>
+                  <a href='/login' className='underline underline-offset-4'>
                     Back to login
                   </a>
                 </div>

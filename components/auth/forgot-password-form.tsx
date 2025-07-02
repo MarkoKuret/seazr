@@ -66,36 +66,39 @@ export function ForgotPasswordForm({
     <div className={cn('flex flex-col gap-6', className)} {...props}>
       <Card>
         <CardHeader>
-          <CardTitle className="text-2xl">Forgot Password</CardTitle>
+          <CardTitle className='text-2xl'>Forgot Password</CardTitle>
           <CardDescription>
-            Enter your email address and we'll send you a link to reset your password
+            Enter your email address and to receive a link for password reset.
           </CardDescription>
         </CardHeader>
         <CardContent>
           {isSuccess ? (
-            <div className="bg-green-50 text-green-800 rounded-md p-4">
+            <div className='rounded-md bg-green-50 p-4 text-green-800'>
               <p>
                 Instructions to reset your password will be sent to you shortly.
               </p>
             </div>
           ) : (
             <Form {...form}>
-              <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+              <form
+                onSubmit={form.handleSubmit(onSubmit)}
+                className='space-y-6'
+              >
                 {error && (
-                  <div className="bg-destructive/15 text-destructive rounded-md p-3 text-sm">
+                  <div className='bg-destructive/15 text-destructive rounded-md p-3 text-sm'>
                     {error}
                   </div>
                 )}
                 <FormField
                   control={form.control}
-                  name="email"
+                  name='email'
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel>Email</FormLabel>
                       <FormControl>
                         <Input
-                          type="email"
-                          placeholder="your@email.com"
+                          type='email'
+                          placeholder='your@email.com'
                           {...field}
                         />
                       </FormControl>
@@ -104,14 +107,14 @@ export function ForgotPasswordForm({
                   )}
                 />
                 <Button
-                  type="submit"
-                  className="w-full"
+                  type='submit'
+                  className='w-full'
                   disabled={isSubmitting}
                 >
                   {isSubmitting ? 'Processing...' : 'Send Reset Link'}
                 </Button>
-                <div className="text-center text-sm">
-                  <a href="/login" className="underline underline-offset-4">
+                <div className='text-center text-sm'>
+                  <a href='/login' className='underline underline-offset-4'>
                     Back to login
                   </a>
                 </div>

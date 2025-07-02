@@ -12,7 +12,7 @@ import {
 } from '@/components/ui/card';
 import { Vessel } from '@/types';
 import { Button } from '@/components/ui/button';
-import { PenIcon, Trash2Icon } from 'lucide-react';
+import { PenIcon, Trash2Icon, UserPlusIcon } from 'lucide-react';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -32,6 +32,7 @@ import {
   SheetTrigger,
 } from '@/components/ui/sheet';
 import { EditVesselForm } from './edit-vessel-form';
+import { AddUserToVesselForm } from './add-user-to-vessel-form';
 import { deleteVessel } from '@/server/vessel-action';
 import { toast } from 'sonner';
 import Link from 'next/link';
@@ -96,8 +97,11 @@ export function VesselsList({ vessels, userId }: VesselsListProps) {
     <>
       <div className='grid gap-4 px-4 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-4 lg:px-6'>
         {vessels.map((vessel) => (
-          <Link key={vessel.id} href={`/vessels/${vessel.shortId}`}>
-            <Card key={vessel.id}>
+          <Card key={vessel.id}>
+            <Link
+              key={vessel.id}
+              href={`/vessels/${vessel.shortId}?name=${encodeURIComponent(vessel.name)}`}
+            >
               <CardHeader>
                 <CardTitle className='text-lg'>{vessel.name}</CardTitle>
                 <CardDescription>ID: {vessel.shortId}</CardDescription>
@@ -109,33 +113,53 @@ export function VesselsList({ vessels, userId }: VesselsListProps) {
                   <p className='text-muted-foreground italic'>No description</p>
                 )}
               </CardContent>
-              <CardFooter className='flex justify-end gap-2'>
-                <Sheet>
-                  <SheetTrigger asChild>
-                    <Button variant='outline' size='sm'>
-                      <PenIcon className='mr-1 h-4 w-4' /> Edit
-                    </Button>
-                  </SheetTrigger>
-                  <SheetContent>
-                    <SheetHeader>
-                      <SheetTitle>Edit Vessel</SheetTitle>
-                      <SheetDescription>
-                        Update your vessel information below.
-                      </SheetDescription>
-                    </SheetHeader>
-                    <EditVesselForm userId={userId} vessel={vessel} />
-                  </SheetContent>
-                </Sheet>
-                <Button
-                  variant='destructive'
-                  size='sm'
-                  onClick={() => handleDeleteClick(vessel)}
-                >
-                  <Trash2Icon className='h-4 w-4' />
-                </Button>
-              </CardFooter>
-            </Card>
-          </Link>
+            </Link>
+            <CardFooter className='flex justify-end gap-2'>
+              <Sheet>
+                <SheetTrigger asChild>
+                  <Button variant='outline' size='sm'>
+                    <PenIcon className='mr-1 h-4 w-4' />
+                  </Button>
+                </SheetTrigger>
+                <SheetContent>
+                  <SheetHeader>
+                    <SheetTitle>Edit Vessel</SheetTitle>
+                    <SheetDescription>
+                      Update your vessel information below.
+                    </SheetDescription>
+                  </SheetHeader>
+                  <EditVesselForm userId={userId} vessel={vessel} />
+                </SheetContent>
+              </Sheet>
+
+              {/* Add new Sheet for adding users */}
+              <Sheet>
+                <SheetTrigger asChild>
+                  <Button variant='outline' size='sm'>
+                    <UserPlusIcon className='mr-1 h-4 w-4' />
+                  </Button>
+                </SheetTrigger>
+                <SheetContent>
+                  <SheetHeader>
+                    <SheetTitle>Add User to Vessel</SheetTitle>
+                    <SheetDescription>
+                      Enter the email of the user you want to add to this
+                      vessel.
+                    </SheetDescription>
+                  </SheetHeader>
+                  <AddUserToVesselForm userId={userId} vessel={vessel} />
+                </SheetContent>
+              </Sheet>
+
+              <Button
+                variant='destructive'
+                size='sm'
+                onClick={() => handleDeleteClick(vessel)}
+              >
+                <Trash2Icon className='h-4 w-4' />
+              </Button>
+            </CardFooter>
+          </Card>
         ))}
       </div>
 

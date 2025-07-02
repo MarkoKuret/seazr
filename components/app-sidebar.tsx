@@ -81,7 +81,7 @@ export function AppSidebar({
               asChild
               className='mt-2 mb-2 data-[slot=sidebar-menu-button]:!p-1.5'
             >
-              <a href='#'>
+              <a href='/dashboard' key='logo'>
                 <Image
                   src='/logo.svg'
                   alt='Logo'

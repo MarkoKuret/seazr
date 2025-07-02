@@ -36,7 +36,26 @@ export async function addVessel({
     });
 
     if (existingVessel) {
-      return { error: 'A vessel with this ID already exists' };
+      const existingPermission = await prisma.permission.findFirst({
+        where: {
+          userId,
+          vesselId: existingVessel.id,
+        },
+      });
+
+      if (existingPermission) {
+        return { error: 'You already have access to this vessel' };
+      }
+
+      // Add permission for the existing vessel
+      await prisma.permission.create({
+        data: {
+          userId,
+          vesselId: existingVessel.id,
+        },
+      });
+
+      return { vessel: existingVessel };
     }
 
     const vessel = await prisma.$transaction(async (tx) => {
@@ -144,5 +163,63 @@ export async function updateVessel({
   } catch (error) {
     console.error('Failed to update vessel', error);
     return { error: 'Failed to update vessel' };
+  }
+}
+
+export async function addUserToVessel({
+  userId,
+  vesselId,
+  email,
+}: {
+  userId: string;
+  vesselId: string;
+  email: string;
+}) {
+  try {
+    // Check if current user has permission to manage this vessel
+    const currentUserPermission = await prisma.permission.findFirst({
+      where: {
+        userId,
+        vesselId,
+      },
+    });
+
+    if (!currentUserPermission) {
+      return { error: 'You do not have permission to manage this vessel' };
+    }
+
+    // Find user by email
+    const userToAdd = await prisma.user.findUnique({
+      where: { email },
+    });
+
+    if (!userToAdd) {
+      return { error: 'User with this email does not exist' };
+    }
+
+    // Check if user already has permission to this vessel
+    const existingPermission = await prisma.permission.findFirst({
+      where: {
+        userId: userToAdd.id,
+        vesselId,
+      },
+    });
+
+    if (existingPermission) {
+      return { error: 'User already has access to this vessel' };
+    }
+
+    // Add permission
+    await prisma.permission.create({
+      data: {
+        userId: userToAdd.id,
+        vesselId,
+      },
+    });
+
+    return { success: true };
+  } catch (error) {
+    console.error('Failed to add user to vessel', error);
+    return { error: 'Failed to add user to vessel' };
   }
 }

@@ -31,7 +31,8 @@ export async function sendEmail({ to, subject, text, html }: SendEmailParams) {
     console.error('Failed to send email:', error);
     return {
       success: false,
-      error: error instanceof Error ? error.message : 'Unknown error sending email'
+      error:
+        error instanceof Error ? error.message : 'Unknown error sending email',
     };
   }
 }

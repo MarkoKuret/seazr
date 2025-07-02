@@ -1,6 +1,6 @@
 export function getPasswordResetEmailTemplate(name: string, url: string) {
   return {
-    subject: "Reset your password",
+    subject: 'Reset your password',
     text: `Click the link to reset your password: ${url}`,
     html: `
     <!DOCTYPE html>
@@ -64,6 +64,6 @@ export function getPasswordResetEmailTemplate(name: string, url: string) {
       </div>
     </body>
     </html>
-    `
+    `,
   };
 }
