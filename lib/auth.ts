@@ -23,6 +23,16 @@ export const auth = betterAuth({
     },
   },
   plugins: [nextCookies()],
+  user: {
+    additionalFields: {
+      role: {
+        type: 'string',
+        required: true,
+        defaultValue: 'USER',
+        input: false,
+      },
+    },
+  },
 });
 
 export async function getSessionApi() {

@@ -6,7 +6,9 @@ import {
   getVesselLocationData,
 } from '@/lib/influxdb';
 import { prisma } from '@/lib/prisma';
+import { checkUserVesselPermission } from '@/lib/utils';
 import { SensorReading, SensorType, VesselLocation } from '@/types';
+import { Role } from '@prisma/client';
 
 /**
  * Gets vessels shortIds a user has permission to access
@@ -152,20 +154,4 @@ export async function getVesselLocation(
       error instanceof Error ? error.message : 'Unknown error occurred';
     throw new Error(message);
   }
-}
-
-async function checkUserVesselPermission(
-  userId: string,
-  vesselId: string
-): Promise<boolean> {
-  const permission = await prisma.permission.findFirst({
-    where: {
-      userId: userId,
-      vessel: {
-        shortId: vesselId,
-      },
-    },
-  });
-
-  return !!permission;
 }

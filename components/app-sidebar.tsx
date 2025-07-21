@@ -5,7 +5,7 @@ import Image from 'next/image';
 import { usePathname } from 'next/navigation';
 
 import { IconHelp, IconAnchor } from '@tabler/icons-react';
-import { ShipWheel, ClipboardPlus } from 'lucide-react';
+import { ShipWheel, ClipboardPlus, ShieldAlert } from 'lucide-react';
 
 import { NavManagement } from '@/components/nav-management';
 import { NavMain } from '@/components/nav-main';
@@ -21,7 +21,8 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
 } from '@/components/ui/sidebar';
-import { Vessel } from '@/types';
+import { Vessel, User } from '@/types';
+import { Role } from '@prisma/client';
 
 const data = {
   user: {
@@ -45,22 +46,25 @@ const data = {
   ],
   management: [
     {
+      name: 'Admin Dashboard',
+      url: '/admin',
+      icon: ShieldAlert,
+      adminOnly: true,
+    },
+    {
       name: 'Manage Vessels',
       url: '/manage',
       icon: ShipWheel,
+      adminOnly: false,
     },
     {
       name: 'Reports',
       url: '/reports',
       icon: ClipboardPlus,
+      adminOnly: false,
     },
   ],
 };
-
-interface User {
-  name: string;
-  email: string;
-}
 
 export function AppSidebar({
   user,
@@ -97,7 +101,13 @@ export function AppSidebar({
       <SidebarContent>
         <NavMain items={data.navMain} currentPath={pathname} />
         <NavVessels vessels={vessels} currentPath={pathname} />
-        <NavManagement items={data.management} currentPath={pathname} />
+        <NavManagement
+          items={data.management.filter(
+            (item) =>
+              !item.adminOnly || (item.adminOnly && user.role == Role.ADMIN)
+          )}
+          currentPath={pathname}
+        />
         <NavSecondary items={data.navSecondary} className='mt-auto' />
       </SidebarContent>
       <SidebarFooter>

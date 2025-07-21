@@ -1,7 +1,8 @@
 'use server';
 
 import { prisma } from '@/lib/prisma';
-import { Vessel } from '@prisma/client';
+import { checkUserVesselPermission } from '@/lib/utils';
+import { Role, Vessel } from '@prisma/client';
 
 export async function getUserVessels(userId: string): Promise<Vessel[]> {
   try {
@@ -92,18 +93,9 @@ export async function deleteVessel({
   vesselId: string;
 }) {
   try {
-    // Check if user has permission to delete this vessel
-    const permission = await prisma.permission.findFirst({
-      where: {
-        userId,
-        vessel: {
-          id: vesselId,
-        },
-      },
-    });
-
-    if (!permission) {
-      return { error: 'You do not have permission to delete this vessel' };
+    const hasPermission = await checkUserVesselPermission(userId, vesselId);
+    if (!hasPermission) {
+      throw new Error('You do not have permission to access this vessel');
     }
 
     // Delete vessel and related permissions
@@ -137,17 +129,9 @@ export async function updateVessel({
 }) {
   try {
     // Check if user has permission to update this vessel
-    const permission = await prisma.permission.findFirst({
-      where: {
-        userId,
-        vessel: {
-          id: vesselId,
-        },
-      },
-    });
-
-    if (!permission) {
-      return { error: 'You do not have permission to update this vessel' };
+    const hasPermission = await checkUserVesselPermission(userId, vesselId);
+    if (!hasPermission) {
+      throw new Error('You do not have permission to access this vessel');
     }
 
     // Update vessel

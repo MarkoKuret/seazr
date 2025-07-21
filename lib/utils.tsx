@@ -9,6 +9,8 @@ import {
   IconClockHour4,
 } from '@tabler/icons-react';
 import { VesselStatusType } from '@/types';
+import { prisma } from './prisma';
+import { Role } from '@prisma/client';
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
@@ -121,4 +123,26 @@ export function urlBase64ToUint8Array(base64String: string) {
     console.error('Error converting base64 to Uint8Array:', error);
     throw new Error('Invalid VAPID public key format');
   }
+}
+
+export async function checkUserVesselPermission(
+  userId: string,
+  vesselId: string
+): Promise<boolean> {
+  const permission = await prisma.permission.findFirst({
+    where: {
+      userId: userId,
+      vessel: {
+        shortId: vesselId,
+      },
+    },
+  });
+  const user = await prisma.user.findUnique({
+    where: { id: userId },
+  });
+  if (user?.role === Role.ADMIN) {
+    return true; // Admins have access to all vessels
+  }
+
+  return !!permission;
 }

@@ -32,6 +32,7 @@ export default async function AuthenticatedLayout({
         user={{
           name: session.user.name,
           email: session.user.email,
+          role: session.user.role,
         }}
       />
       <SidebarInset>{children}</SidebarInset>
