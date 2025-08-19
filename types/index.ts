@@ -17,7 +17,7 @@ export type SensorType =
   | 'Wind'
   | 'Water'
   | 'Fuel'
-  | 'Bilge'; // Added new sensor type
+  | 'Bilge';
 
 export type SensorUnit = 'V' | '°C' | 'L' | '%' | 'hPa' | 'kn' | '';
 

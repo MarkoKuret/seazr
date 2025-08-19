@@ -17,11 +17,6 @@ async function VesselSensorCards({ vesselId }: { vesselId: string }) {
     redirect('/login');
   }
 
-  sendNotification(
-    'Seazr Notification',
-    `Sensor data for vessel ${vesselId} has been successfully loaded.`
-  );
-
   try {
     const sensors = await getAllSensorValues(session.user.id, vesselId);
     return (

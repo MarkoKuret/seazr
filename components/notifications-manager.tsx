@@ -1,10 +1,16 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import { toast } from 'sonner';
-import { Bell, BellOff, Loader2 } from 'lucide-react';
+import { Bell, BellOff, Loader2, Mail, MailX } from 'lucide-react';
 import { urlBase64ToUint8Array } from '@/lib/utils';
 import { subscribeUser, unsubscribeUser } from '@/server/notification-action';
+import {
+  getUserNotificationPreferences,
+  toggleEmailNotifications,
+  togglePushNotifications,
+  type NotificationPreferences,
+} from '@/server/notification-preference-action';
 import {
   Card,
   CardContent,
@@ -15,7 +21,11 @@ import {
 import { Switch } from '@/components/ui/switch';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 
-export function PushNotificationManager() {
+interface PushNotificationManagerProps {
+  userId: string;
+}
+
+export function PushNotificationManager({ userId }: PushNotificationManagerProps) {
   const [isSupported, setIsSupported] = useState(false);
   const [subscription, setSubscription] = useState<PushSubscription | null>(
     null
@@ -24,6 +34,20 @@ export function PushNotificationManager() {
   const [isLoading, setIsLoading] = useState(true);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [preferences, setPreferences] = useState<NotificationPreferences>({
+    emailNotifications: true,
+    pushNotifications: true,
+  });
+  const [isUpdatingEmail, setIsUpdatingEmail] = useState(false);
+
+  const loadUserPreferences = useCallback(async () => {
+    try {
+      const userPrefs = await getUserNotificationPreferences(userId);
+      setPreferences(userPrefs);
+    } catch (error) {
+      console.error('Error loading user preferences:', error);
+    }
+  }, [userId]);
 
   useEffect(() => {
     async function initializeNotifications() {
@@ -31,6 +55,7 @@ export function PushNotificationManager() {
         setIsSupported(true);
         try {
           await registerServiceWorker();
+          await loadUserPreferences();
         } catch (error) {
           console.error('Service worker registration failed:', error);
           setError('Failed to initialize push notifications');
@@ -39,12 +64,18 @@ export function PushNotificationManager() {
         }
       } else {
         setIsSupported(false);
-        setIsLoading(false);
+        try {
+          await loadUserPreferences();
+        } catch (error) {
+          console.error('Failed to load preferences:', error);
+        } finally {
+          setIsLoading(false);
+        }
       }
     }
 
     initializeNotifications();
-  }, []);
+  }, [userId, loadUserPreferences]);
 
   async function registerServiceWorker() {
     try {
@@ -71,15 +102,50 @@ export function PushNotificationManager() {
     try {
       if (isSubscribed) {
         await unsubscribeFromPush();
+        await togglePushNotifications(userId, false);
       } else {
         await subscribeToPush();
+        await togglePushNotifications(userId, true);
       }
+      await loadUserPreferences();
     } catch (error) {
       setError('Failed to update notification settings');
       toast.error('Failed to update notification settings');
       console.error(error);
     } finally {
       setIsSubmitting(false);
+    }
+  }
+
+  async function handleEmailToggle() {
+    if (isUpdatingEmail) return;
+
+    setIsUpdatingEmail(true);
+    setError(null);
+
+    try {
+      const newEmailState = !preferences.emailNotifications;
+      const result = await toggleEmailNotifications(userId, newEmailState);
+
+      if (result.success) {
+        setPreferences(prev => ({
+          ...prev,
+          emailNotifications: newEmailState,
+        }));
+        toast.success(
+          newEmailState
+            ? 'Email notifications enabled'
+            : 'Email notifications disabled'
+        );
+      } else {
+        throw new Error(result.error || 'Failed to update email preferences');
+      }
+    } catch (error) {
+      setError('Failed to update email notification settings');
+      toast.error('Failed to update email notification settings');
+      console.error(error);
+    } finally {
+      setIsUpdatingEmail(false);
     }
   }
 
@@ -111,9 +177,9 @@ export function PushNotificationManager() {
       setSubscription(sub);
       setIsSubscribed(true);
 
-      // Store subscription on server
+      // Store subscription on server with user ID
       const serializedSub = JSON.parse(JSON.stringify(sub));
-      const result = await subscribeUser(serializedSub);
+      const result = await subscribeUser(serializedSub, userId);
 
       if (result.success) {
         toast.success('Successfully subscribed to push notifications');
@@ -150,80 +216,211 @@ export function PushNotificationManager() {
 
   if (!isSupported) {
     return (
-      <Card>
-        <CardHeader>
-          <CardTitle>Push Notifications</CardTitle>
-          <CardDescription>
-            Receive alerts and updates about your vessels directly to this
-            device
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          <Alert variant='destructive'>
-            <AlertDescription>
-              Push notifications are not supported in this browser. Please use a
-              modern browser like Chrome, Firefox, or Edge.
-            </AlertDescription>
-          </Alert>
-        </CardContent>
-      </Card>
+      <div className="space-y-4">
+        {/* Email Notifications Card */}
+        <Card>
+          <CardHeader>
+            <CardTitle>Email Notifications</CardTitle>
+            <CardDescription className='flex items-center justify-between'>
+              Vessel alerts via email
+              {isLoading ? (
+                <Loader2 className='text-muted-foreground h-5 w-5 animate-spin' />
+              ) : (
+                <Switch
+                  id='email-notifications'
+                  checked={preferences.emailNotifications}
+                  onCheckedChange={handleEmailToggle}
+                  disabled={isUpdatingEmail}
+                />
+              )}
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className='space-y-6'>
+              {error && (
+                <Alert variant='destructive'>
+                  <AlertDescription>{error}</AlertDescription>
+                </Alert>
+              )}
+
+              <div className='bg-muted flex items-start gap-3 rounded-md p-4'>
+                {preferences.emailNotifications ? (
+                  <>
+                    <Mail className='text-primary mt-0.5 h-5 w-5' />
+                    <div>
+                      <h4 className='font-medium'>Email notifications are enabled</h4>
+                      <p className='text-muted-foreground mt-1 text-sm'>
+                        You will receive email alerts for important vessel events,
+                        such as bilge water detection, critical battery levels, and
+                        security events.
+                      </p>
+                    </div>
+                  </>
+                ) : (
+                  <>
+                    <MailX className='text-muted-foreground mt-0.5 h-5 w-5' />
+                    <div>
+                      <h4 className='font-medium'>Email notifications are disabled</h4>
+                      <p className='text-muted-foreground mt-1 text-sm'>
+                        Enable email notifications to receive alerts about important
+                        vessel events in your inbox.
+                      </p>
+                    </div>
+                  </>
+                )}
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Push Notifications Card */}
+        <Card>
+          <CardHeader>
+            <CardTitle>Push Notifications</CardTitle>
+            <CardDescription>
+              Receive alerts and updates about your vessels directly to this
+              device
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <Alert variant='destructive'>
+              <AlertDescription>
+               <p>
+    <strong>Push notifications on mobile require the app to be installed as a Progressive Web App (PWA).</strong><br />
+    To enable notifications:
+  </p>
+  <ul>
+    <li>
+      <strong>On iOS (iPhone/iPad):</strong> Open the site in <em>Safari</em>, tap the <em>Share</em> icon, and select <em>&ldquo;Add to Home Screen&rdquo;</em>.
+    </li>
+    <li>
+      <strong>On Android:</strong> Use <em>Chrome</em>, <em>Firefox</em>, or <em>Edge</em>. Open the menu (three dots) and tap <em>&ldquo;Install app&rdquo;</em> or <em>&ldquo;Add to Home screen&rdquo;</em>.
+    </li>
+  </ul>
+  <p>
+    After installation, you will be able to receive push notifications just like with a native mobile app.
+  </p>
+              </AlertDescription>
+            </Alert>
+          </CardContent>
+        </Card>
+      </div>
     );
   }
 
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle>Push Notifications</CardTitle>
-        <CardDescription className='flex items-center justify-between'>
-          Receive alerts and updates about your vessels directly to this device
-          {isLoading ? (
-            <Loader2 className='text-muted-foreground h-5 w-5 animate-spin' />
-          ) : (
-            <Switch
-              id='notifications'
-              checked={isSubscribed}
-              onCheckedChange={handleSubscriptionToggle}
-              disabled={isSubmitting}
-            />
-          )}
-        </CardDescription>
-      </CardHeader>
-      <CardContent>
-        <div className='space-y-6'>
-          {error && (
-            <Alert variant='destructive'>
-              <AlertDescription>{error}</AlertDescription>
-            </Alert>
-          )}
-
-          <div className='bg-muted flex items-start gap-3 rounded-md p-4'>
-            {isSubscribed ? (
-              <>
-                <Bell className='text-primary mt-0.5 h-5 w-5' />
-                <div>
-                  <h4 className='font-medium'>Notifications are enabled</h4>
-                  <p className='text-muted-foreground mt-1 text-sm'>
-                    You will receive notifications for important vessel alerts,
-                    such as bilge water detection, critical battery levels, and
-                    security events.
-                  </p>
-                </div>
-              </>
+    <div className="space-y-4">
+      {/* Email Notifications Card */}
+      <Card>
+        <CardHeader>
+          <CardTitle>Email Notifications</CardTitle>
+          <CardDescription className='flex items-center justify-between'>
+            Vessel alerts via email
+            {isLoading ? (
+              <Loader2 className='text-muted-foreground h-5 w-5 animate-spin' />
             ) : (
-              <>
-                <BellOff className='text-muted-foreground mt-0.5 h-5 w-5' />
-                <div>
-                  <h4 className='font-medium'>Notifications are disabled</h4>
-                  <p className='text-muted-foreground mt-1 text-sm'>
-                    Enable notifications to get immediate alerts about important
-                    vessel events.
-                  </p>
-                </div>
-              </>
+              <Switch
+                id='email-notifications'
+                checked={preferences.emailNotifications}
+                onCheckedChange={handleEmailToggle}
+                disabled={isUpdatingEmail}
+              />
             )}
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          <div className='space-y-6'>
+            {error && (
+              <Alert variant='destructive'>
+                <AlertDescription>{error}</AlertDescription>
+              </Alert>
+            )}
+
+            <div className='bg-muted flex items-start gap-3 rounded-md p-4'>
+              {preferences.emailNotifications ? (
+                <>
+                  <Mail className='text-primary mt-0.5 h-5 w-5' />
+                  <div>
+                    <h4 className='font-medium'>Email notifications are enabled</h4>
+                    <p className='text-muted-foreground mt-1 text-sm'>
+                      You will receive email alerts for important vessel events,
+                      such as bilge water detection, critical battery levels, and
+                      security events.
+                    </p>
+                  </div>
+                </>
+              ) : (
+                <>
+                  <MailX className='text-muted-foreground mt-0.5 h-5 w-5' />
+                  <div>
+                    <h4 className='font-medium'>Email notifications are disabled</h4>
+                    <p className='text-muted-foreground mt-1 text-sm'>
+                      Enable email notifications to receive alerts about important
+                      vessel events in your inbox.
+                    </p>
+                  </div>
+                </>
+              )}
+            </div>
           </div>
-        </div>
-      </CardContent>
-    </Card>
+        </CardContent>
+      </Card>
+
+      {/* Push Notifications Card */}
+      <Card>
+        <CardHeader>
+          <CardTitle>Push Notifications</CardTitle>
+          <CardDescription className='flex items-center justify-between'>
+            Receive alerts and updates about your vessels directly to this device
+            {isLoading ? (
+              <Loader2 className='text-muted-foreground h-5 w-5 animate-spin' />
+            ) : (
+              <Switch
+                id='notifications'
+                checked={isSubscribed && preferences.pushNotifications}
+                onCheckedChange={handleSubscriptionToggle}
+                disabled={isSubmitting}
+              />
+            )}
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          <div className='space-y-6'>
+            {error && (
+              <Alert variant='destructive'>
+                <AlertDescription>{error}</AlertDescription>
+              </Alert>
+            )}
+
+            <div className='bg-muted flex items-start gap-3 rounded-md p-4'>
+              {isSubscribed && preferences.pushNotifications ? (
+                <>
+                  <Bell className='text-primary mt-0.5 h-5 w-5' />
+                  <div>
+                    <h4 className='font-medium'>Push notifications are enabled</h4>
+                    <p className='text-muted-foreground mt-1 text-sm'>
+                      You will receive push notifications for important vessel alerts,
+                      such as bilge water detection, critical battery levels, and
+                      security events.
+                    </p>
+                  </div>
+                </>
+              ) : (
+                <>
+                  <BellOff className='text-muted-foreground mt-0.5 h-5 w-5' />
+                  <div>
+                    <h4 className='font-medium'>Push notifications are disabled</h4>
+                    <p className='text-muted-foreground mt-1 text-sm'>
+                      Enable push notifications to get immediate alerts about important
+                      vessel events on this device.
+                    </p>
+                  </div>
+                </>
+              )}
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+    </div>
   );
 }
