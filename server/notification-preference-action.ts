@@ -7,7 +7,9 @@ export interface NotificationPreferences {
   pushNotifications: boolean;
 }
 
-export async function getUserNotificationPreferences(userId: string): Promise<NotificationPreferences> {
+export async function getUserNotificationPreferences(
+  userId: string
+): Promise<NotificationPreferences> {
   try {
     const preferences = await prisma.notificationPreference.findUnique({
       where: { userId },
@@ -60,7 +62,10 @@ export async function updateNotificationPreferences(
   }
 }
 
-export async function toggleEmailNotifications(userId: string, enabled: boolean) {
+export async function toggleEmailNotifications(
+  userId: string,
+  enabled: boolean
+) {
   try {
     const result = await prisma.notificationPreference.upsert({
       where: { userId },
@@ -81,7 +86,10 @@ export async function toggleEmailNotifications(userId: string, enabled: boolean)
   }
 }
 
-export async function togglePushNotifications(userId: string, enabled: boolean) {
+export async function togglePushNotifications(
+  userId: string,
+  enabled: boolean
+) {
   try {
     const result = await prisma.notificationPreference.upsert({
       where: { userId },

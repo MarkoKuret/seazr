@@ -35,14 +35,19 @@ export async function GET(request: NextRequest) {
       try {
         // Skip if vessel has no users with permissions
         if (vessel.permissions.length === 0) {
-          console.log(`Skipping vessel ${vessel.name} - no users with permissions`);
+          console.log(
+            `Skipping vessel ${vessel.name} - no users with permissions`
+          );
           continue;
         }
 
         // Get sensor readings using the first user with permissions
         // (all users with permissions should see the same sensor data)
         const firstUserId = vessel.permissions[0].userId;
-        const sensorReadings = await getAllSensorValues(firstUserId, vessel.shortId);
+        const sensorReadings = await getAllSensorValues(
+          firstUserId,
+          vessel.shortId
+        );
         const healthStatus = determineVesselStatus(sensorReadings);
 
         if (healthStatus.status === 'alarm') {
@@ -50,8 +55,8 @@ export async function GET(request: NextRequest) {
           processedVessels.push(vessel.name);
 
           const alarmMessages = healthStatus.description
-            .filter(desc => desc.status === 'alarm')
-            .map(desc => desc.text)
+            .filter((desc) => desc.status === 'alarm')
+            .map((desc) => desc.text)
             .join(', ');
 
           const notificationTitle = `🚨 Vessel Alert: ${vessel.name}`;
@@ -72,7 +77,9 @@ export async function GET(request: NextRequest) {
             if (result.emailsSent > 0) {
               totalEmailsSent += result.emailsSent;
             }
-            console.log(`Sent ${result.notificationsSent || 0} push notifications and ${result.emailsSent || 0} emails for vessel: ${vessel.name}`);
+            console.log(
+              `Sent ${result.notificationsSent || 0} push notifications and ${result.emailsSent || 0} emails for vessel: ${vessel.name}`
+            );
           } else {
             console.log(`No notifications sent for vessel: ${vessel.name}`);
           }
@@ -82,8 +89,12 @@ export async function GET(request: NextRequest) {
       }
     }
 
-    console.log(`Vessel alarm check completed. Found ${totalAlarmsFound} alarms, sent ${totalNotificationsSent} push notifications and ${totalEmailsSent} emails.`);
-    console.log(`Processed vessels with alarms: ${processedVessels.join(', ')}`);
+    console.log(
+      `Vessel alarm check completed. Found ${totalAlarmsFound} alarms, sent ${totalNotificationsSent} push notifications and ${totalEmailsSent} emails.`
+    );
+    console.log(
+      `Processed vessels with alarms: ${processedVessels.join(', ')}`
+    );
 
     return NextResponse.json({
       success: true,
@@ -93,7 +104,6 @@ export async function GET(request: NextRequest) {
       vesselsWithAlarms: processedVessels,
       timestamp: new Date().toISOString(),
     });
-
   } catch (error) {
     console.error('Error in vessel alarm check:', error);
     return NextResponse.json(

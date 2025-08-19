@@ -25,7 +25,9 @@ interface PushNotificationManagerProps {
   userId: string;
 }
 
-export function PushNotificationManager({ userId }: PushNotificationManagerProps) {
+export function PushNotificationManager({
+  userId,
+}: PushNotificationManagerProps) {
   const [isSupported, setIsSupported] = useState(false);
   const [subscription, setSubscription] = useState<PushSubscription | null>(
     null
@@ -128,7 +130,7 @@ export function PushNotificationManager({ userId }: PushNotificationManagerProps
       const result = await toggleEmailNotifications(userId, newEmailState);
 
       if (result.success) {
-        setPreferences(prev => ({
+        setPreferences((prev) => ({
           ...prev,
           emailNotifications: newEmailState,
         }));
@@ -216,7 +218,7 @@ export function PushNotificationManager({ userId }: PushNotificationManagerProps
 
   if (!isSupported) {
     return (
-      <div className="space-y-4">
+      <div className='space-y-4'>
         {/* Email Notifications Card */}
         <Card>
           <CardHeader>
@@ -248,11 +250,13 @@ export function PushNotificationManager({ userId }: PushNotificationManagerProps
                   <>
                     <Mail className='text-primary mt-0.5 h-5 w-5' />
                     <div>
-                      <h4 className='font-medium'>Email notifications are enabled</h4>
+                      <h4 className='font-medium'>
+                        Email notifications are enabled
+                      </h4>
                       <p className='text-muted-foreground mt-1 text-sm'>
-                        You will receive email alerts for important vessel events,
-                        such as bilge water detection, critical battery levels, and
-                        security events.
+                        You will receive email alerts for important vessel
+                        events, such as bilge water detection, critical battery
+                        levels, and security events.
                       </p>
                     </div>
                   </>
@@ -260,10 +264,12 @@ export function PushNotificationManager({ userId }: PushNotificationManagerProps
                   <>
                     <MailX className='text-muted-foreground mt-0.5 h-5 w-5' />
                     <div>
-                      <h4 className='font-medium'>Email notifications are disabled</h4>
+                      <h4 className='font-medium'>
+                        Email notifications are disabled
+                      </h4>
                       <p className='text-muted-foreground mt-1 text-sm'>
-                        Enable email notifications to receive alerts about important
-                        vessel events in your inbox.
+                        Enable email notifications to receive alerts about
+                        important vessel events in your inbox.
                       </p>
                     </div>
                   </>
@@ -285,21 +291,31 @@ export function PushNotificationManager({ userId }: PushNotificationManagerProps
           <CardContent>
             <Alert variant='destructive'>
               <AlertDescription>
-               <p>
-    <strong>Push notifications on mobile require the app to be installed as a Progressive Web App (PWA).</strong><br />
-    To enable notifications:
-  </p>
-  <ul>
-    <li>
-      <strong>On iOS (iPhone/iPad):</strong> Open the site in <em>Safari</em>, tap the <em>Share</em> icon, and select <em>&ldquo;Add to Home Screen&rdquo;</em>.
-    </li>
-    <li>
-      <strong>On Android:</strong> Use <em>Chrome</em>, <em>Firefox</em>, or <em>Edge</em>. Open the menu (three dots) and tap <em>&ldquo;Install app&rdquo;</em> or <em>&ldquo;Add to Home screen&rdquo;</em>.
-    </li>
-  </ul>
-  <p>
-    After installation, you will be able to receive push notifications just like with a native mobile app.
-  </p>
+                <p>
+                  <strong>
+                    Push notifications on mobile require the app to be installed
+                    as a Progressive Web App (PWA).
+                  </strong>
+                  <br />
+                  To enable notifications:
+                </p>
+                <ul>
+                  <li>
+                    <strong>On iOS (iPhone/iPad):</strong> Open the site in{' '}
+                    <em>Safari</em>, tap the <em>Share</em> icon, and select{' '}
+                    <em>&ldquo;Add to Home Screen&rdquo;</em>.
+                  </li>
+                  <li>
+                    <strong>On Android:</strong> Use <em>Chrome</em>,{' '}
+                    <em>Firefox</em>, or <em>Edge</em>. Open the menu (three
+                    dots) and tap <em>&ldquo;Install app&rdquo;</em> or{' '}
+                    <em>&ldquo;Add to Home screen&rdquo;</em>.
+                  </li>
+                </ul>
+                <p>
+                  After installation, you will be able to receive push
+                  notifications just like with a native mobile app.
+                </p>
               </AlertDescription>
             </Alert>
           </CardContent>
@@ -309,7 +325,7 @@ export function PushNotificationManager({ userId }: PushNotificationManagerProps
   }
 
   return (
-    <div className="space-y-4">
+    <div className='space-y-4'>
       {/* Email Notifications Card */}
       <Card>
         <CardHeader>
@@ -341,11 +357,13 @@ export function PushNotificationManager({ userId }: PushNotificationManagerProps
                 <>
                   <Mail className='text-primary mt-0.5 h-5 w-5' />
                   <div>
-                    <h4 className='font-medium'>Email notifications are enabled</h4>
+                    <h4 className='font-medium'>
+                      Email notifications are enabled
+                    </h4>
                     <p className='text-muted-foreground mt-1 text-sm'>
                       You will receive email alerts for important vessel events,
-                      such as bilge water detection, critical battery levels, and
-                      security events.
+                      such as bilge water detection, critical battery levels,
+                      and security events.
                     </p>
                   </div>
                 </>
@@ -353,10 +371,12 @@ export function PushNotificationManager({ userId }: PushNotificationManagerProps
                 <>
                   <MailX className='text-muted-foreground mt-0.5 h-5 w-5' />
                   <div>
-                    <h4 className='font-medium'>Email notifications are disabled</h4>
+                    <h4 className='font-medium'>
+                      Email notifications are disabled
+                    </h4>
                     <p className='text-muted-foreground mt-1 text-sm'>
-                      Enable email notifications to receive alerts about important
-                      vessel events in your inbox.
+                      Enable email notifications to receive alerts about
+                      important vessel events in your inbox.
                     </p>
                   </div>
                 </>
@@ -371,7 +391,8 @@ export function PushNotificationManager({ userId }: PushNotificationManagerProps
         <CardHeader>
           <CardTitle>Push Notifications</CardTitle>
           <CardDescription className='flex items-center justify-between'>
-            Receive alerts and updates about your vessels directly to this device
+            Receive alerts and updates about your vessels directly to this
+            device
             {isLoading ? (
               <Loader2 className='text-muted-foreground h-5 w-5 animate-spin' />
             ) : (
@@ -397,11 +418,13 @@ export function PushNotificationManager({ userId }: PushNotificationManagerProps
                 <>
                   <Bell className='text-primary mt-0.5 h-5 w-5' />
                   <div>
-                    <h4 className='font-medium'>Push notifications are enabled</h4>
+                    <h4 className='font-medium'>
+                      Push notifications are enabled
+                    </h4>
                     <p className='text-muted-foreground mt-1 text-sm'>
-                      You will receive push notifications for important vessel alerts,
-                      such as bilge water detection, critical battery levels, and
-                      security events.
+                      You will receive push notifications for important vessel
+                      alerts, such as bilge water detection, critical battery
+                      levels, and security events.
                     </p>
                   </div>
                 </>
@@ -409,10 +432,12 @@ export function PushNotificationManager({ userId }: PushNotificationManagerProps
                 <>
                   <BellOff className='text-muted-foreground mt-0.5 h-5 w-5' />
                   <div>
-                    <h4 className='font-medium'>Push notifications are disabled</h4>
+                    <h4 className='font-medium'>
+                      Push notifications are disabled
+                    </h4>
                     <p className='text-muted-foreground mt-1 text-sm'>
-                      Enable push notifications to get immediate alerts about important
-                      vessel events on this device.
+                      Enable push notifications to get immediate alerts about
+                      important vessel events on this device.
                     </p>
                   </div>
                 </>

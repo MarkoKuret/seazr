@@ -22,7 +22,7 @@ export async function subscribeUser(sub: PushSubscription, userId?: string) {
   try {
     const subscriptionData = {
       ...sub,
-      userId: userId
+      userId: userId,
     };
 
     await prisma.pushSubscription.upsert({
@@ -120,14 +120,21 @@ export async function sendNotificationForVessel(
     });
 
     if (vesselPermissions.length === 0) {
-      return { success: true, message: 'No users to notify', notificationsSent: 0, emailsSent: 0 };
+      return {
+        success: true,
+        message: 'No users to notify',
+        notificationsSent: 0,
+        emailsSent: 0,
+      };
     }
 
     // Get the authorized user IDs and emails
-    const authorizedUserIds = vesselPermissions.map(p => p.userId);
-    const authorizedUsers = vesselPermissions.map(p => p.user.email);
+    const authorizedUserIds = vesselPermissions.map((p) => p.userId);
+    const authorizedUsers = vesselPermissions.map((p) => p.user.email);
 
-    console.log(`Vessel ${vesselName} alarm should notify users: ${authorizedUsers.join(', ')}`);
+    console.log(
+      `Vessel ${vesselName} alarm should notify users: ${authorizedUsers.join(', ')}`
+    );
 
     // Get notification preferences for all authorized users
     const userPreferences = await Promise.all(
@@ -138,8 +145,10 @@ export async function sendNotificationForVessel(
     );
 
     // Filter users who want email notifications
-    const emailEnabledUsers = vesselPermissions.filter(permission => {
-      const userPref = userPreferences.find(pref => pref.userId === permission.userId);
+    const emailEnabledUsers = vesselPermissions.filter((permission) => {
+      const userPref = userPreferences.find(
+        (pref) => pref.userId === permission.userId
+      );
       return userPref?.preferences.emailNotifications !== false;
     });
 
@@ -204,23 +213,25 @@ Seazr Team`;
       })
     );
 
-    const emailSuccessCount = emailResults.filter(r => r.success).length;
-    const emailFailedCount = emailResults.filter(r => !r.success).length;
+    const emailSuccessCount = emailResults.filter((r) => r.success).length;
+    const emailFailedCount = emailResults.filter((r) => !r.success).length;
 
     // Filter users who want push notifications
     const pushEnabledUserIds = userPreferences
-      .filter(pref => pref.preferences.pushNotifications !== false)
-      .map(pref => pref.userId);
+      .filter((pref) => pref.preferences.pushNotifications !== false)
+      .map((pref) => pref.userId);
 
     // Get all push subscriptions and filter for authorized users with push enabled
     const allSubscriptions = await prisma.pushSubscription.findMany();
 
     // Filter subscriptions by checking if userId is stored in the subscription data and user wants push notifications
-    const authorizedSubscriptions = allSubscriptions.filter(sub => {
+    const authorizedSubscriptions = allSubscriptions.filter((sub) => {
       const subscriptionData = sub.subscription as any;
-      return subscriptionData.userId &&
-             authorizedUserIds.includes(subscriptionData.userId) &&
-             pushEnabledUserIds.includes(subscriptionData.userId);
+      return (
+        subscriptionData.userId &&
+        authorizedUserIds.includes(subscriptionData.userId) &&
+        pushEnabledUserIds.includes(subscriptionData.userId)
+      );
     });
 
     let pushNotificationResults = [];
@@ -228,11 +239,15 @@ Seazr Team`;
     let pushFailedCount = 0;
 
     if (authorizedSubscriptions.length === 0) {
-      console.log(`No push subscriptions found for authorized users with push notifications enabled for vessel ${vesselId}`);
-      console.log(`Falling back to sending push notification to all ${allSubscriptions.length} subscriptions`);
+      console.log(
+        `No push subscriptions found for authorized users with push notifications enabled for vessel ${vesselId}`
+      );
+      console.log(
+        `Falling back to sending push notification to all ${allSubscriptions.length} subscriptions`
+      );
 
       // Only send to users who have push notifications enabled (if we can determine it)
-      const fallbackSubscriptions = allSubscriptions.filter(sub => {
+      const fallbackSubscriptions = allSubscriptions.filter((sub) => {
         const subscriptionData = sub.subscription as any;
         if (subscriptionData.userId) {
           return pushEnabledUserIds.includes(subscriptionData.userId);
@@ -255,23 +270,30 @@ Seazr Team`;
                   vesselName,
                   type: 'vessel-alarm',
                   authorizedUsers: authorizedUsers,
-                  note: 'Update your notification settings to receive targeted alerts'
+                  note: 'Update your notification settings to receive targeted alerts',
                 },
               })
             );
             return { success: true, endpoint: sub.endpoint };
           } catch (error) {
-            console.error(`Error sending push notification to ${sub.endpoint}:`, error);
+            console.error(
+              `Error sending push notification to ${sub.endpoint}:`,
+              error
+            );
             return { success: false, endpoint: sub.endpoint };
           }
         })
       );
 
-      pushSuccessCount = pushNotificationResults.filter((r) => r.success).length;
-      pushFailedCount = pushNotificationResults.filter((r) => !r.success).length;
+      pushSuccessCount = pushNotificationResults.filter(
+        (r) => r.success
+      ).length;
+      pushFailedCount = pushNotificationResults.filter(
+        (r) => !r.success
+      ).length;
 
       return {
-        success: (emailSuccessCount > 0) || (pushSuccessCount > 0),
+        success: emailSuccessCount > 0 || pushSuccessCount > 0,
         emailsSent: emailSuccessCount,
         emailsFailed: emailFailedCount,
         pushNotificationsSent: pushSuccessCount,
@@ -281,7 +303,7 @@ Seazr Team`;
         pushEnabledUsersCount: pushEnabledUserIds.length,
         totalSubscriptions: allSubscriptions.length,
         notificationsSent: pushSuccessCount, // For backward compatibility
-        note: 'Sent push notifications to users with preferences enabled - user-specific targeting not yet fully configured'
+        note: 'Sent push notifications to users with preferences enabled - user-specific targeting not yet fully configured',
       };
     }
 
@@ -298,7 +320,7 @@ Seazr Team`;
               data: {
                 vesselId,
                 vesselName,
-                type: 'vessel-alarm'
+                type: 'vessel-alarm',
               },
             })
           );
@@ -316,10 +338,12 @@ Seazr Team`;
     pushSuccessCount = pushNotificationResults.filter((r) => r.success).length;
     pushFailedCount = pushNotificationResults.filter((r) => !r.success).length;
 
-    console.log(`Sent ${emailSuccessCount} emails and ${pushSuccessCount} push notifications for vessel ${vesselName} to authorized users (${emailEnabledUsers.length} email-enabled, ${pushEnabledUserIds.length} push-enabled)`);
+    console.log(
+      `Sent ${emailSuccessCount} emails and ${pushSuccessCount} push notifications for vessel ${vesselName} to authorized users (${emailEnabledUsers.length} email-enabled, ${pushEnabledUserIds.length} push-enabled)`
+    );
 
     return {
-      success: (emailSuccessCount > 0) || (pushSuccessCount > 0),
+      success: emailSuccessCount > 0 || pushSuccessCount > 0,
       emailsSent: emailSuccessCount,
       emailsFailed: emailFailedCount,
       pushNotificationsSent: pushSuccessCount,
@@ -332,6 +356,11 @@ Seazr Team`;
     };
   } catch (error) {
     console.error('Error sending vessel-specific notifications:', error);
-    return { success: false, error: 'Failed to send notification', notificationsSent: 0, emailsSent: 0 };
+    return {
+      success: false,
+      error: 'Failed to send notification',
+      notificationsSent: 0,
+      emailsSent: 0,
+    };
   }
 }
